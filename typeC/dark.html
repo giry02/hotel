@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>객실 상세 — THE GRAND HOTEL (Dark)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+    :root{--bg:#0D0D0D;--sf:#1A1A1A;--sf2:#242424;--sf3:#2E2E2E;--gold:#C9A96E;--gold-lt:#E2C992;--gold-dk:#A07D40;--txt:#F5F0E8;--txt2:#9E9A93;--txt3:#6B6560;--success:#6BBF7B;--danger:#D46464;--r-sm:8px;--r-md:14px;--r-lg:20px;--tr:all .3s cubic-bezier(.4,0,.2,1);--serif:'Playfair Display',serif;--sans:'Noto Sans KR','Inter',sans-serif}
+    </style>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <div class="app-wrap">
+    <nav class="nav">
+        <button class="nav-btn" onclick="history.back()"><i class="fa-solid fa-xmark"></i></button>
+        <span class="nav-center">PREMIER SUITE</span>
+        <div class="nav-right"><button class="nav-btn"><i class="fa-regular fa-heart"></i></button><button class="nav-btn"><i class="fa-solid fa-share-nodes"></i></button></div>
+    </nav>
+
+    <div class="gallery">
+        <div class="gallery-slides" id="gSlides">
+            <div class="gallery-slide"><img src="../images/room_suite.png" alt="R1"></div>
+            <div class="gallery-slide"><img src="../images/hero_banner.png" alt="R2"></div>
+            <div class="gallery-slide"><img src="../images/dining.png" alt="R3"></div>
+        </div>
+        <div class="gallery-grad"></div>
+        <div class="gallery-dots" id="gDots"><div class="gd active"></div><div class="gd"></div><div class="gd"></div></div>
+        <div class="gallery-counter" id="gCnt">1 / 3</div>
+    </div>
+
+    <div class="room-header">
+        <span class="room-tag"><i class="fa-solid fa-gem" style="font-size:.6rem"></i> PREMIER COLLECTION</span>
+        <h1 class="room-name">프리미어 오션 스위트</h1>
+        <p class="room-sub">Premier Ocean Suite · 35F~40F</p>
+        <div class="meta-row">
+            <span class="meta-chip"><i class="fa-solid fa-maximize"></i> 76m²</span>
+            <span class="meta-chip"><i class="fa-solid fa-bed"></i> 킹 1</span>
+            <span class="meta-chip"><i class="fa-solid fa-user-group"></i> 2~3인</span>
+            <span class="meta-chip"><i class="fa-solid fa-water"></i> 오션뷰</span>
+        </div>
+    </div>
+
+    <div class="selector-bar">
+        <div class="sel-field"><div class="sel-label">체크인 · 체크아웃</div><div class="sel-value"><i class="fa-regular fa-calendar"></i> 06.14 — 06.16 (2박)</div></div>
+        <div class="sel-field"><div class="sel-label">투숙 인원</div><div class="sel-value"><i class="fa-solid fa-user-group"></i> 성인 2 · 아동 0</div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-nav" id="tabNav">
+        <div class="tab-btn active" data-tab="info">객실 정보</div>
+        <div class="tab-btn" data-tab="amenity">편의시설</div>
+        <div class="tab-btn" data-tab="review">후기 (286)</div>
+        <div class="tab-btn" data-tab="policy">규정</div>
+    </div>
+
+    <!-- TAB: INFO -->
+    <div class="tab-panel active" id="panel-info">
+        <div class="sec-title"><i class="fa-solid fa-concierge-bell"></i> 객실 소개</div>
+        <ul class="info-list">
+            <li>최상층 오션뷰 · 일출/일몰 파노라마</li>
+            <li>프리미엄 구스다운 침구 & 메모리폼 베개</li>
+            <li>딥 소킹 욕조 + 독립 레인샤워</li>
+            <li>네스프레소 버츄오 머신 & 캡슐 6종</li>
+            <li>이그제큐티브 라운지 무제한 이용</li>
+            <li>24시간 전담 버틀러 서비스</li>
+        </ul>
+        <div class="floor-info">
+            <div class="floor-row"><span class="floor-label">객실 크기</span><span class="floor-val">76m² (23평)</span></div>
+            <div class="floor-row"><span class="floor-label">베드 타입</span><span class="floor-val">킹 베드 1개</span></div>
+            <div class="floor-row"><span class="floor-label">전망</span><span class="floor-val">오션뷰 (남향)</span></div>
+            <div class="floor-row"><span class="floor-label">층수</span><span class="floor-val">35F ~ 40F</span></div>
+            <div class="floor-row"><span class="floor-label">체크인/아웃</span><span class="floor-val">15:00 / 11:00</span></div>
+        </div>
+    </div>
+
+    <!-- TAB: AMENITY -->
+    <div class="tab-panel" id="panel-amenity">
+        <div class="sec-title"><i class="fa-solid fa-spa"></i> 편의 시설</div>
+        <div class="am-grid">
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-wifi"></i></div><span class="am-label">초고속WiFi</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-wine-glass"></i></div><span class="am-label">미니바</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-bath"></i></div><span class="am-label">딥소킹욕조</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-snowflake"></i></div><span class="am-label">개별냉난방</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-tv"></i></div><span class="am-label">75" OLED</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-vault"></i></div><span class="am-label">안전금고</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-mug-hot"></i></div><span class="am-label">커피머신</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-shirt"></i></div><span class="am-label">가운·슬리퍼</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-soap"></i></div><span class="am-label">명품어메니티</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-wind"></i></div><span class="am-label">드라이어</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-bottle-water"></i></div><span class="am-label">무료생수</span></div>
+            <div class="am-item"><div class="am-icon"><i class="fa-solid fa-phone"></i></div><span class="am-label">룸서비스</span></div>
+        </div>
+    </div>
+
+    <!-- TAB: REVIEW -->
+    <div class="tab-panel" id="panel-review">
+        <div class="rv-summary">
+            <div><div class="rv-big">4.7</div></div>
+            <div>
+                <div class="rv-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
+                <div class="rv-count">286건의 후기</div>
+            </div>
+        </div>
+        <div class="rv-tags">
+            <span class="rv-tag">뷰가 좋아요<em>128</em></span>
+            <span class="rv-tag">청결해요<em>96</em></span>
+            <span class="rv-tag">서비스 최고<em>84</em></span>
+            <span class="rv-tag">침구가 편해요<em>72</em></span>
+            <span class="rv-tag">재방문 의사<em>65</em></span>
+        </div>
+        <div class="rv-card">
+            <div class="rv-top"><div class="rv-avatar"><i class="fa-solid fa-user"></i></div><div><div class="rv-name">박○○</div><div class="rv-date">2025.05.20</div></div><div class="rv-star-sm"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div></div>
+            <div class="rv-text">오션뷰가 정말 압도적이었습니다. 침구도 최고급이라 숙면했어요. 버틀러 서비스도 세심하고 감동이었습니다.</div>
+        </div>
+        <div class="rv-card">
+            <div class="rv-top"><div class="rv-avatar"><i class="fa-solid fa-user"></i></div><div><div class="rv-name">최○○</div><div class="rv-date">2025.05.12</div></div><div class="rv-star-sm"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div></div>
+            <div class="rv-text">욕조에서 바다가 보여서 정말 힐링했어요. 라운지도 조용하고 좋았습니다. 재방문 확정!</div>
+        </div>
+        <div class="rv-more-btn">후기 286건 전체보기 <i class="fa-solid fa-chevron-right" style="font-size:.6rem"></i></div>
+    </div>
+
+    <!-- TAB: POLICY -->
+    <div class="tab-panel" id="panel-policy">
+        <div class="sec-title"><i class="fa-solid fa-shield-halved"></i> 취소 및 환불</div>
+        <table class="pol-table">
+            <tr><th>7일 전</th><td class="green">100% 전액 환불</td></tr>
+            <tr><th>5일 전</th><td class="yellow">70% 환불</td></tr>
+            <tr><th>3일 전</th><td class="yellow">50% 환불</td></tr>
+            <tr><th>1일 전~당일</th><td class="red">환불 불가</td></tr>
+        </table>
+        <div class="sec-title" style="margin-top:24px"><i class="fa-solid fa-circle-info"></i> 이용 안내</div>
+        <div class="notice-box">
+            <p>• 전 객실 금연 (위반 시 과태료 부과)</p>
+            <p>• 반려동물 동반 불가</p>
+            <p>• 추가 인원 시 1인당 ₩50,000 별도</p>
+            <p>• 얼리 체크인/레이트 체크아웃 현장 요청</p>
+            <p>• 천재지변 시 증빙 제출 후 전액 환불 가능</p>
+        </div>
+    </div>
+
+    </div><!-- /.app-wrap -->
+
+    <div class="bottom-bar">
+        <div class="bb-price">
+            <div class="bb-orig">₩620,000</div>
+            <div class="bb-cur">₩465,000 <small>/ 1박</small> <span class="bb-disc">25%</span></div>
+        </div>
+        <button class="btn-book">예약하기</button>
+    </div>
+
+    <script>
+        // Gallery
+        const gs=document.getElementById('gSlides'),gd=document.querySelectorAll('.gd'),gc=document.getElementById('gCnt');
+        let ci=0,tt=3;
+        function goG(i){ci=i;gs.style.transform=`translateX(-${i*100}%)`;gd.forEach((d,j)=>d.classList.toggle('active',j===i));gc.textContent=`${i+1} / ${tt}`}
+        gd.forEach((d,i)=>d.addEventListener('click',()=>goG(i)));
+        setInterval(()=>goG((ci+1)%tt),5000);
+        let sx=0;const gl=document.querySelector('.gallery');
+        gl.addEventListener('touchstart',e=>sx=e.changedTouches[0].screenX);
+        gl.addEventListener('touchend',e=>{const d=sx-e.changedTouches[0].screenX;if(Math.abs(d)>50){d>0?goG(Math.min(ci+1,tt-1)):goG(Math.max(ci-1,0))}});
+
+        // Tabs
+        const tabBtns=document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn=>{
+            btn.addEventListener('click',()=>{
+                tabBtns.forEach(b=>b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+                document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

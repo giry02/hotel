@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>객실 상세 — THE GRAND HOTEL (Light)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+                :root {
+            --bg:#FAF8F5;--txt:#1A1A1A;--txt2:#555555;--txt3:#999999;--txt-heading:#1A1A1A;--txt-body:#4D4D4D;
+            --primary:#F2114C;--star:#FFB800;--success:#2D6A4F;--danger:#F2114C;
+            --heading:'Noto Sans KR',sans-serif;--sans:'Noto Sans KR',sans-serif;
+            --r-sm:8px;--r-md:14px;--r-lg:20px;--tr:all .3s cubic-bezier(.4,0,.2,1);
+            --nav-bg:rgba(255,255,255,.98);--nav-icon:#1A1A1A;--nav-hover:rgba(0,0,0,.04);--border-subtle:#E8E2DA;
+            --hero-grad:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.1) 40%,rgba(250,248,245,.95) 100%);
+            --tag-bg:#FFF0F3;--tag-color:#F2114C;--tag-border:rgba(242,17,76,.15);
+            --divider:#E8E2DA;--section-divider:#F0EBE4;
+            --card-bg:#FFFFFF;--card-border:#E8E2DA;--field-bg:#F5F0EB;--field-hover:rgba(242,17,76,.2);
+            --icon-border:#E8E2DA;--icon-glow:0 4px 12px rgba(242,17,76,.06);
+            --event-bg:linear-gradient(135deg,rgba(242,17,76,.04),rgba(242,17,76,.01));--event-border:rgba(242,17,76,.12);
+            --bar-bg:#E8E2DA;
+            --bottom-bg:rgba(255,255,255,.98);--bottom-border:#E8E2DA;
+            --discount-bg:rgba(242,17,76,.08);
+            --btn-bg:linear-gradient(135deg,#C10E3D,#F2114C);--btn-color:#FFFFFF;--btn-shadow:0 6px 20px rgba(242,17,76,.3);
+            --frame-border:rgba(0,0,0,.06);
+        }
+    </style>
+    <link rel="stylesheet" href="common.css">
+</head>
+<body>
+    <nav class="nav" id="topNav">
+        <button class="nav-btn" onclick="history.back()"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="nav-actions">
+            <button class="nav-btn"><i class="fa-regular fa-heart"></i></button>
+            <button class="nav-btn"><i class="fa-solid fa-share-nodes"></i></button>
+        </div>
+    </nav>
+    <div class="hero">
+        <div class="hero-slides" id="heroSlides">
+            <div class="hero-slide"><img src="../images/room_suite.png" alt="객실"><div class="hero-grad"></div></div>
+            <div class="hero-slide"><img src="../images/hero_banner.png" alt="뷰"><div class="hero-grad"></div></div>
+            <div class="hero-slide"><img src="../images/dining.png" alt="시설"><div class="hero-grad"></div></div>
+        </div>
+        <div class="hero-dots" id="heroDots"><div class="hero-dot active"></div><div class="hero-dot"></div><div class="hero-dot"></div></div>
+        <div class="hero-counter"><i class="fa-solid fa-camera" style="margin-right:4px"></i> 1 / 3</div>
+    </div>
+    <div class="room-header fade-in d1">
+        <span class="room-tag">Signature Suite</span>
+        <h1 class="room-name">더 그랜드 시그니처 스위트</h1>
+        <div class="room-meta">
+            <span><i class="fa-solid fa-maximize"></i> 92m²</span>
+            <span><i class="fa-solid fa-bed"></i> 킹 베드 1</span>
+            <span><i class="fa-solid fa-user-group"></i> 기준 2인 / 최대 4인</span>
+            <span><i class="fa-solid fa-mountain-sun"></i> 오션뷰</span>
+            <span><i class="fa-solid fa-clock"></i> 입실 15:00 · 퇴실 11:00</span>
+        </div>
+    </div>
+    <div class="rating-row fade-in d2">
+        <div>
+            <div class="rating-score">4.8</div>
+            <div class="rating-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div>
+            <div class="rating-count">리뷰 328건</div>
+        </div>
+        <div class="rating-bar-wrap">
+            <div class="rating-mini"><span>청결</span><div class="rating-mini-bar"><div class="rating-mini-fill" style="width:96%"></div></div><span>4.9</span></div>
+            <div class="rating-mini"><span>위치</span><div class="rating-mini-bar"><div class="rating-mini-fill" style="width:90%"></div></div><span>4.5</span></div>
+            <div class="rating-mini"><span>서비스</span><div class="rating-mini-bar"><div class="rating-mini-fill" style="width:94%"></div></div><span>4.7</span></div>
+            <div class="rating-mini"><span>시설</span><div class="rating-mini-bar"><div class="rating-mini-fill" style="width:92%"></div></div><span>4.6</span></div>
+        </div>
+    </div>
+    <div class="event-banner fade-in d3">
+        <div class="event-emoji">✨</div>
+        <div><div class="event-title">얼리버드 특가 · 최대 25% 할인</div><div class="event-desc">6월 예약 시 이그제큐티브 라운지 무료 이용</div></div>
+    </div>
+    <div class="date-widget fade-in d3">
+        <div class="dw-title"><i class="fa-regular fa-calendar"></i> 예약 일정 선택</div>
+        <div class="dw-grid">
+            <div class="dw-field"><div class="dw-label">체크인</div><div class="dw-value"><i class="fa-regular fa-calendar"></i> 06.14 (토)</div></div>
+            <div style="text-align:center"><div class="dw-nights">2박</div><div class="dw-arrow"><i class="fa-solid fa-arrow-right"></i></div></div>
+            <div class="dw-field"><div class="dw-label">체크아웃</div><div class="dw-value"><i class="fa-regular fa-calendar"></i> 06.16 (월)</div></div>
+        </div>
+        <div class="dw-guests">
+            <div class="dw-field"><div class="dw-label">성인</div><div class="dw-value"><i class="fa-solid fa-user"></i> 2명</div></div>
+            <div class="dw-field"><div class="dw-label">아동</div><div class="dw-value"><i class="fa-solid fa-child"></i> 0명</div></div>
+        </div>
+    </div>
+    <div class="section">
+        <h3 class="sec-title"><i class="fa-solid fa-concierge-bell"></i> 객실 안내</h3>
+        <ul class="detail-list">
+            <li>최상층(38~42F) 위치, 파노라마 오션뷰</li>
+            <li>프리미엄 구스다운 침구 & 베개 메뉴 서비스</li>
+            <li>딥 소킹 욕조 및 레인샤워 시스템</li>
+            <li>네스프레소 버츄오 머신 · 캡슐 6종 제공</li>
+            <li>전담 버틀러 서비스 (24시간)</li>
+            <li>이그제큐티브 라운지 전용 체크인</li>
+        </ul>
+    </div>
+    <div class="section">
+        <h3 class="sec-title"><i class="fa-solid fa-spa"></i> 편의 시설</h3>
+        <div class="amenity-grid">
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-wifi"></i></div><span class="amenity-label">초고속 WiFi</span></div>
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-wine-glass"></i></div><span class="amenity-label">미니바</span></div>
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-bath"></i></div><span class="amenity-label">딥소킹욕조</span></div>
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-snowflake"></i></div><span class="amenity-label">개별냉난방</span></div>
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-tv"></i></div><span class="amenity-label">75" OLED</span></div>
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-vault"></i></div><span class="amenity-label">안전금고</span></div>
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-mug-hot"></i></div><span class="amenity-label">커피머신</span></div>
+            <div class="amenity-item"><div class="amenity-icon"><i class="fa-solid fa-shirt"></i></div><span class="amenity-label">가운/슬리퍼</span></div>
+        </div>
+    </div>
+    <div class="section">
+        <h3 class="sec-title"><i class="fa-solid fa-comment-dots"></i> 투숙 후기</h3>
+        <div class="review-card">
+            <div class="rv-top"><div class="rv-avatar"><i class="fa-solid fa-user"></i></div><div><div class="rv-name">김○○</div><div class="rv-date">2025.05.28 투숙</div></div><div class="rv-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div></div>
+            <div class="rv-text">뷰가 정말 환상적이었습니다. 버틀러 서비스도 매우 친절하고 세심했어요.</div>
+        </div>
+        <div class="review-card">
+            <div class="rv-top"><div class="rv-avatar"><i class="fa-solid fa-user"></i></div><div><div class="rv-name">이○○</div><div class="rv-date">2025.05.15 투숙</div></div><div class="rv-stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i></div></div>
+            <div class="rv-text">침구가 정말 편안하고 욕조에서 바다가 보여서 힐링 그 자체였어요.</div>
+        </div>
+        <div class="rv-more">후기 328건 전체보기 <i class="fa-solid fa-chevron-right" style="font-size:.65rem"></i></div>
+    </div>
+    <div class="section">
+        <h3 class="sec-title"><i class="fa-solid fa-shield-halved"></i> 취소 및 환불 규정</h3>
+        <table class="policy-table">
+            <tr><th>7일 전까지</th><td class="refund-full">100% 전액 환불</td></tr>
+            <tr><th>5일 전까지</th><td class="refund-partial">70% 환불</td></tr>
+            <tr><th>3일 전까지</th><td class="refund-partial">50% 환불</td></tr>
+            <tr><th>1일 전 ~ 당일</th><td class="refund-none">환불 불가</td></tr>
+        </table>
+    </div>
+    <div class="bottom-bar">
+        <div class="price-wrap">
+            <div class="price-original">₩680,000</div>
+            <div class="price-current">₩510,000 <small>/ 1박</small> <span class="price-discount">25%</span></div>
+        </div>
+        <button class="btn-book">예약하기</button>
+    </div>
+    <script>
+        const nav=document.getElementById('topNav');
+        window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scrollY>40));
+        const slides=document.getElementById('heroSlides'),dots=document.querySelectorAll('.hero-dot'),counter=document.querySelector('.hero-counter');
+        let cur=0,total=3;
+        function goSlide(i){cur=i;slides.style.transform=`translateX(-${i*100}%)`;dots.forEach((d,j)=>d.classList.toggle('active',j===i));counter.innerHTML=`<i class="fa-solid fa-camera" style="margin-right:4px"></i> ${i+1} / ${total}`}
+        dots.forEach((d,i)=>d.addEventListener('click',()=>goSlide(i)));
+        setInterval(()=>goSlide((cur+1)%total),5000);
+        let tx=0;const hero=document.querySelector('.hero');
+        hero.addEventListener('touchstart',e=>tx=e.changedTouches[0].screenX);
+        hero.addEventListener('touchend',e=>{const d=tx-e.changedTouches[0].screenX;if(Math.abs(d)>50){d>0?goSlide(Math.min(cur+1,total-1)):goSlide(Math.max(cur-1,0))}});
+    </script>
+</body>
+</html>

@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE GRAND HOTEL — 호텔 예약 관리 시스템</title>
+    <meta name="description" content="THE GRAND HOTEL 공식 모바일 앱. 객실 예약, 모바일 체크인, 컨시어지 서비스를 경험하세요.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ========== CSS RESET & VARIABLES ========== */
+        *, *::before, *::after {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg: #0D0D0D;
+            --color-surface: #1A1A1A;
+            --color-surface-2: #242424;
+            --color-surface-3: #2E2E2E;
+            --color-gold: #C9A96E;
+            --color-gold-light: #E2C992;
+            --color-gold-dark: #A07D40;
+            --color-text: #F5F0E8;
+            --color-text-secondary: #9E9A93;
+            --color-text-muted: #6B6560;
+            --color-accent: #7DAFCB;
+            --color-success: #6BBF7B;
+            --color-danger: #D46464;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 30px rgba(201,169,110,0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Noto Sans KR', 'Inter', sans-serif;
+        }
+
+        html {
+            font-size: 18px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px; /* bottom tab */
+        }
+
+        /* ========== GNB (USR-COM-003) ========== */
+        .gnb {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: transparent;
+            transition: var(--transition);
+        }
+
+        .gnb.scrolled {
+            background: rgba(13,13,13,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(201,169,110,0.12);
+        }
+
+        .gnb__logo {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .gnb__actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .gnb__btn {
+            background: none; border: none; color: var(--color-text);
+            font-size: 1.2rem; cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+        .gnb__btn:hover { color: var(--color-gold); }
+
+        .gnb__badge {
+            position: absolute;
+            top: -5px; right: -8px;
+            background: var(--color-danger);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* ========== HERO BANNER (USR-HOM-001) ========== */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            overflow: hidden;
+        }
+
+        .hero__slides {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+        }
+
+        .hero__slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .hero__slide img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        .hero__overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(13,13,13,0.1) 0%,
+                rgba(13,13,13,0.3) 40%,
+                rgba(13,13,13,0.85) 100%
+            );
+        }
+
+        .hero__content {
+            position: absolute;
+            bottom: 60px;
+            left: 24px; right: 24px;
+        }
+        
+        .hero__dots {
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 5;
+        }
+
+        .hero__tag {
+            display: inline-block;
+            background: rgba(201,169,110,0.2);
+            color: var(--color-gold-light);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid rgba(201,169,110,0.3);
+            margin-bottom: 14px;
+        }
+
+        .hero__title {
+            font-family: var(--font-serif);
+            font-size: 2.0rem;
+            font-weight: 600;
+            line-height: 1.25;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .hero__desc {
+            font-size: 0.92rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.5;
+        }
+
+
+
+        .hero__dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .hero__dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: var(--color-gold);
+        }
+
+        /* ========== QUICK SEARCH WIDGET ========== */
+        .quick-search {
+            margin: -30px 16px 0;
+            position: relative;
+            z-index: 10;
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid rgba(201,169,110,0.15);
+            box-shadow: var(--shadow-card), var(--shadow-glow);
+        }
+
+        .quick-search__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .quick-search__title {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-gold-light);
+        }
+
+        .quick-search__subtitle {
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+        }
+
+        .quick-search__grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .qs-field {
+            background: var(--color-surface-2);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+        .qs-field:hover { border-color: rgba(201,169,110,0.25); }
+
+        .qs-field__label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .qs-field__value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--color-text);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .qs-field__value i {
+            color: var(--color-gold);
+            font-size: 0.88rem;
+        }
+
+        .qs-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold));
+            color: #0D0D0D;
+            font-family: var(--font-sans);
+            font-size: 1.0rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(201,169,110,0.3);
+        }
+
+        /* ========== SECTION COMMON ========== */
+        .section {
+            padding: 32px 16px;
+        }
+
+        .section__header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+
+        .section__label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-gold);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .section__title {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .section__more {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex; align-items: center; gap: 4px;
+        }
+        .section__more:hover { color: var(--color-gold); }
+
+        /* ========== MEMBERSHIP SUMMARY (USR-MYP-001 Preview) ========== */
+        .membership {
+            margin: 24px 16px 0;
+            background: linear-gradient(135deg, #1E2A3A 0%, #1A1F2E 50%, #252020 100%);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid rgba(201,169,110,0.12);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .membership::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, rgba(201,169,110,0.15), transparent);
+            border-radius: 50%;
+        }
+
+        .membership__top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .membership__greeting {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .membership__name {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .membership__tier {
+            display: flex; align-items: center; gap: 6px;
+            background: rgba(201,169,110,0.15);
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid rgba(201,169,110,0.25);
+        }
+
+        .membership__tier-icon {
+            color: var(--color-gold);
+            font-size: 0.85rem;
+        }
+
+        .membership__tier-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--color-gold-light);
+            letter-spacing: 1.5px;
+        }
+
+        .membership__stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .m-stat {
+            text-align: center;
+            padding: 12px 0;
+            border-right: 1px solid rgba(255,255,255,0.06);
+        }
+        .m-stat:last-child { border-right: none; }
+
+        .m-stat__value {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--color-gold-light);
+        }
+
+        .m-stat__label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        /* ========== QUICK ACTIONS ========== */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px 8px;
+            padding: 24px 16px 0;
+        }
+
+        .qa-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .qa-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .qa-item__icon {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .qa-item:nth-child(1) .qa-item__icon { background: rgba(74, 144, 226, 0.15); color: #4A90E2; }
+        .qa-item:nth-child(2) .qa-item__icon { background: rgba(91, 141, 239, 0.15); color: #5B8DEF; }
+        .qa-item:nth-child(3) .qa-item__icon { background: rgba(76, 175, 80, 0.15); color: #4CAF50; }
+        .qa-item:nth-child(4) .qa-item__icon { background: rgba(255, 152, 0, 0.15); color: #FF9800; }
+        .qa-item:nth-child(5) .qa-item__icon { background: rgba(156, 39, 176, 0.15); color: #9C27B0; }
+        .qa-item:nth-child(6) .qa-item__icon { background: rgba(233, 30, 99, 0.15); color: #E91E63; }
+        .qa-item:nth-child(7) .qa-item__icon { background: rgba(0, 188, 212, 0.15); color: #00BCD4; }
+        .qa-item:nth-child(8) .qa-item__icon { background: rgba(255, 193, 7, 0.15); color: #FFC107; }
+        .qa-item:nth-child(9) .qa-item__icon { background: rgba(138, 43, 226, 0.15); color: #8A2BE2; }
+        .qa-item:nth-child(10) .qa-item__icon { background: rgba(3, 169, 244, 0.15); color: #03A9F4; }
+
+        .qa-item:hover .qa-item__icon {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .qa-item__label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-align: center;
+            letter-spacing: -0.3px;
+        }
+
+        /* ========== PACKAGE CARDS (Promotions) ========== */
+        .packages-scroll {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding: 0 16px 8px;
+            scroll-snap-type: x mandatory;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .packages-scroll::-webkit-scrollbar { display: none; }
+
+        .package-card {
+            min-width: 280px;
+            scroll-snap-align: start;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            background: var(--color-surface);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .package-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-card);
+        }
+
+        .package-card__img {
+            width: 100%; height: 160px;
+            object-fit: cover;
+        }
+
+        .package-card__body {
+            padding: 16px;
+        }
+
+        .package-card__tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        .package-card__tag--hot { background: rgba(212,100,100,0.2); color: var(--color-danger); }
+        .package-card__tag--new { background: rgba(107,191,123,0.2); color: var(--color-success); }
+        .package-card__tag--limited { background: rgba(201,169,110,0.2); color: var(--color-gold); }
+
+        .package-card__name {
+            font-size: 1.0rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .package-card__desc {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .package-card__footer {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+        }
+
+        .package-card__price-old {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            text-decoration: line-through;
+        }
+
+        .package-card__price {
+            font-family: var(--font-serif);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-gold-light);
+        }
+
+        .package-card__price span {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--color-text-muted);
+        }
+
+        .package-card__cta {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--color-gold);
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        /* ========== FACILITY HUB (USR-FAC-001) ========== */
+        .facility-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 16px;
+        }
+
+        .facility-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+            aspect-ratio: 1 / 1;
+        }
+        .facility-item:hover { transform: scale(1.02); }
+        .facility-item.wide { grid-column: 1 / -1; aspect-ratio: 2.2 / 1; }
+
+        .facility-item__bg {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+
+        .facility-item__overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.0) 40%, rgba(0,0,0,0.75) 100%);
+        }
+
+        .facility-item__content {
+            position: absolute;
+            bottom: 14px; left: 14px; right: 14px;
+        }
+
+        .facility-item__emoji {
+            font-size: 1.3rem;
+            margin-bottom: 4px;
+        }
+
+        .facility-item__name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .facility-item__sub {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ========== UPCOMING RESERVATION ========== */
+        .upcoming {
+            margin: 0 16px;
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid rgba(201,169,110,0.1);
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .upcoming:hover {
+            border-color: rgba(201,169,110,0.3);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .upcoming__dday {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold));
+            border-radius: var(--radius-md);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .upcoming__dday-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: rgba(13,13,13,0.6);
+            text-transform: uppercase;
+        }
+
+        .upcoming__dday-value {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0D0D0D;
+            line-height: 1;
+        }
+
+        .upcoming__info {
+            flex: 1;
+        }
+
+        .upcoming__hotel {
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+            margin-bottom: 2px;
+        }
+
+        .upcoming__room {
+            font-size: 1.0rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .upcoming__dates {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .upcoming__arrow {
+            color: var(--color-text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* ========== CONCIERGE CTA ========== */
+        .concierge-cta {
+            margin: 0 16px;
+            background: linear-gradient(135deg, #1A2A2A 0%, #0D1F1F 100%);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            border: 1px solid rgba(125,175,203,0.15);
+            transition: var(--transition);
+        }
+        .concierge-cta:hover {
+            border-color: rgba(125,175,203,0.35);
+        }
+
+        .concierge-cta__icon {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: rgba(125,175,203,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            color: var(--color-accent);
+            flex-shrink: 0;
+        }
+
+        .concierge-cta__text h4 {
+            font-size: 1.0rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .concierge-cta__text p {
+            font-size: 0.82rem;
+            color: var(--color-text-muted);
+        }
+
+        .concierge-cta__badge {
+            margin-left: auto;
+            background: var(--color-accent);
+            color: #0D0D0D;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        /* ========== BOTTOM TAB BAR (USR-COM-004) ========== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            z-index: 1000;
+            background: rgba(13,13,13,0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 0 env(safe-area-inset-bottom, 8px);
+            height: 72px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            padding: 4px 12px;
+        }
+
+        .tab-item__icon {
+            font-size: 1.15rem;
+            color: var(--color-text-muted);
+            transition: var(--transition);
+        }
+
+        .tab-item__label {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            transition: var(--transition);
+        }
+
+        .tab-item.active .tab-item__icon { color: var(--color-gold); }
+        .tab-item.active .tab-item__label { color: var(--color-gold-light); font-weight: 600; }
+
+        .tab-item.active::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            width: 24px; height: 3px;
+            background: var(--color-gold);
+            border-radius: 0 0 3px 3px;
+        }
+
+        .tab-item--center {
+            position: relative;
+            top: -16px;
+        }
+
+        .tab-item--center .tab-item__icon {
+            width: 52px; height: 52px;
+            background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #0D0D0D !important;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 20px rgba(201,169,110,0.35);
+        }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            opacity: 0;
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        /* ========== RESPONSIVE ========== */
+        @media (min-width: 480px) {
+            body {
+                max-width: 430px;
+                margin: 0 auto;
+                border-left: 1px solid rgba(255,255,255,0.04);
+                border-right: 1px solid rgba(255,255,255,0.04);
+            }
+            .gnb, .tab-bar {
+                max-width: 430px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ========== DIVIDER ========== */
+        .divider {
+            height: 8px;
+            background: rgba(0,0,0,0.3);
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== GNB (USR-COM-003) ==================== -->
+    <nav class="gnb" id="gnb">
+        <div class="gnb__logo" data-tenant-editable="logo">The Grand</div>
+        <div class="gnb__actions">
+            <button class="gnb__btn" id="btn-cart" aria-label="장바구니">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+            <button class="gnb__btn" id="btn-notifications" aria-label="알림">
+                <i class="fa-solid fa-bell"></i>
+                <span class="gnb__badge">3</span>
+            </button>
+            <button class="gnb__btn" id="btn-menu" aria-label="메뉴">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ==================== HERO BANNER (USR-HOM-001) ==================== -->
+    <section class="hero" id="hero-banner">
+        <div class="hero__slides" id="heroSlides">
+            <div class="hero__slide">
+                <img src="../images/hero_banner.png" alt="THE GRAND HOTEL 외관" data-tenant-editable="banner">
+                <div class="hero__overlay"></div>
+                <div class="hero__content">
+                    <div class="hero__tag">Special Offer</div>
+                    <h1 class="hero__title">Early Summer<br>프리미엄 패키지</h1>
+                    <p class="hero__desc">2025 여름, 인피니티 풀과 함께하는 리조트 스테이</p>
+                </div>
+            </div>
+            <div class="hero__slide">
+                <img src="../images/room_suite.png" alt="프리미엄 스위트룸" data-tenant-editable="banner">
+                <div class="hero__overlay"></div>
+                <div class="hero__content">
+                    <div class="hero__tag">Suite Upgrade</div>
+                    <h1 class="hero__title">오션뷰 스위트<br>무상 업그레이드</h1>
+                    <p class="hero__desc">디럭스 예약 시 스위트룸으로 자동 업그레이드</p>
+                </div>
+            </div>
+            <div class="hero__slide">
+                <img src="../images/dining.png" alt="파인 다이닝" data-tenant-editable="banner">
+                <div class="hero__overlay"></div>
+                <div class="hero__content">
+                    <div class="hero__tag">Dining Week</div>
+                    <h1 class="hero__title">미슐랭 셰프<br>다이닝 위크</h1>
+                    <p class="hero__desc">6.1 ~ 6.15 한정 코스 디너 30% 할인</p>
+                </div>
+            </div>
+        </div>
+        <div class="hero__dots" id="heroDots">
+            <div class="hero__dot active" data-index="0"></div>
+            <div class="hero__dot" data-index="1"></div>
+            <div class="hero__dot" data-index="2"></div>
+        </div>
+    </section>
+
+    <!-- ==================== QUICK SEARCH ==================== -->
+    <div class="quick-search animate-in delay-1" id="quick-search">
+        <div class="quick-search__header">
+            <div>
+                <div class="quick-search__title">객실 예약</div>
+                <div class="quick-search__subtitle">Book your perfect stay</div>
+            </div>
+            <span style="font-size:0.72rem; color:var(--color-gold); cursor:pointer;">캘린더 보기 →</span>
+        </div>
+        <div class="quick-search__grid">
+            <div class="qs-field" id="qs-checkin">
+                <div class="qs-field__label">체크인</div>
+                <div class="qs-field__value"><i class="fa-regular fa-calendar"></i> 2025.06.14 (토)</div>
+            </div>
+            <div class="qs-field" id="qs-checkout">
+                <div class="qs-field__label">체크아웃</div>
+                <div class="qs-field__value"><i class="fa-regular fa-calendar"></i> 2025.06.16 (월)</div>
+            </div>
+            <div class="qs-field" id="qs-guest">
+                <div class="qs-field__label">투숙 인원</div>
+                <div class="qs-field__value"><i class="fa-solid fa-user-group"></i> 성인 2 · 아동 0</div>
+            </div>
+            <div class="qs-field" id="qs-room-type">
+                <div class="qs-field__label">객실 타입</div>
+                <div class="qs-field__value"><i class="fa-solid fa-bed"></i> 전체</div>
+            </div>
+        </div>
+        <button class="btn-search" id="btn-search-room">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            객실 검색하기
+        </button>
+    </div>
+
+    <!-- ==================== QUICK ACTIONS ==================== -->
+    <div class="quick-actions animate-in delay-2">
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-hotel"></i></div>
+            <div class="qa-item__label">객실</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-golf-ball-tee"></i></div>
+            <div class="qa-item__label">골프</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-car"></i></div>
+            <div class="qa-item__label">렌터카</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-utensils"></i></div>
+            <div class="qa-item__label">다이닝</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-spa"></i></div>
+            <div class="qa-item__label">스파</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-van-shuttle"></i></div>
+            <div class="qa-item__label">픽업</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-water-ladder"></i></div>
+            <div class="qa-item__label">수영장</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-champagne-glasses"></i></div>
+            <div class="qa-item__label">연회장</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-qrcode"></i></div>
+            <div class="qa-item__label">모바일 키</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-item__icon"><i class="fa-solid fa-ellipsis"></i></div>
+            <div class="qa-item__label">전체</div>
+        </div>
+    </div>
+
+    <!-- ==================== MEMBERSHIP SUMMARY ==================== -->
+    <div class="section" style="padding-bottom:0;">
+        <div class="membership animate-in delay-3" id="membership-card">
+            <div class="membership__top">
+                <div>
+                    <div class="membership__greeting">Welcome back,</div>
+                    <div class="membership__name">김지원 님</div>
+                </div>
+                <div class="membership__tier">
+                    <i class="fa-solid fa-crown membership__tier-icon"></i>
+                    <span class="membership__tier-text">GOLD</span>
+                </div>
+            </div>
+            <div class="membership__stats">
+                <div class="m-stat">
+                    <div class="m-stat__value">12,450</div>
+                    <div class="m-stat__label">보유 포인트</div>
+                </div>
+                <div class="m-stat">
+                    <div class="m-stat__value">7</div>
+                    <div class="m-stat__label">누적 투숙</div>
+                </div>
+                <div class="m-stat">
+                    <div class="m-stat__value">2</div>
+                    <div class="m-stat__label">사용 가능 쿠폰</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== UPCOMING RESERVATION ==================== -->
+    <div class="section" id="section-upcoming">
+        <div class="section__header">
+            <div>
+                <div class="section__label">Upcoming</div>
+                <h2 class="section__title">다가오는 예약</h2>
+            </div>
+            <span class="section__more">전체 보기 <i class="fa-solid fa-chevron-right" style="font-size:0.6rem"></i></span>
+        </div>
+        <div class="upcoming" id="upcoming-card">
+            <div class="upcoming__dday">
+                <div class="upcoming__dday-label">D-Day</div>
+                <div class="upcoming__dday-value">21</div>
+            </div>
+            <div class="upcoming__info">
+                <div class="upcoming__hotel">THE GRAND HOTEL · 제주</div>
+                <div class="upcoming__room">오션뷰 디럭스 트윈</div>
+                <div class="upcoming__dates">
+                    <i class="fa-regular fa-calendar" style="font-size:0.7rem; color:var(--color-gold)"></i>
+                    6.14(토) – 6.16(월) · 2박
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right upcoming__arrow"></i>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ==================== PACKAGES (Promotions) ==================== -->
+    <div class="section" id="section-packages">
+        <div class="section__header">
+            <div>
+                <div class="section__label">Packages</div>
+                <h2 class="section__title">이달의 추천 패키지</h2>
+            </div>
+            <span class="section__more">전체 보기 <i class="fa-solid fa-chevron-right" style="font-size:0.6rem"></i></span>
+        </div>
+        <div class="packages-scroll">
+            <div class="package-card" id="pkg-summer">
+                <img class="package-card__img" src="../images/hero_banner.png" alt="썸머 에스케이프">
+                <div class="package-card__body">
+                    <span class="package-card__tag package-card__tag--hot">HOT DEAL</span>
+                    <div class="package-card__name">썸머 에스케이프 2박</div>
+                    <div class="package-card__desc">조식 2인 + 인피니티 풀 이용 + 스파 바우처</div>
+                    <div class="package-card__footer">
+                        <div>
+                            <div class="package-card__price-old">₩780,000</div>
+                            <div class="package-card__price">₩580,000 <span>/ 2박</span></div>
+                        </div>
+                        <div class="package-card__cta">예약 →</div>
+                    </div>
+                </div>
+            </div>
+            <div class="package-card" id="pkg-golf">
+                <img class="package-card__img" src="../images/room_suite.png" alt="골프 패키지">
+                <div class="package-card__body">
+                    <span class="package-card__tag package-card__tag--new">NEW</span>
+                    <div class="package-card__name">골프 앤 스테이 3박</div>
+                    <div class="package-card__desc">그린피 2R + 스위트룸 + 공항 픽업 서비스</div>
+                    <div class="package-card__footer">
+                        <div>
+                            <div class="package-card__price-old">₩1,950,000</div>
+                            <div class="package-card__price">₩1,490,000 <span>/ 3박</span></div>
+                        </div>
+                        <div class="package-card__cta">예약 →</div>
+                    </div>
+                </div>
+            </div>
+            <div class="package-card" id="pkg-dining">
+                <img class="package-card__img" src="../images/dining.png" alt="다이닝 패키지">
+                <div class="package-card__body">
+                    <span class="package-card__tag package-card__tag--limited">LIMITED</span>
+                    <div class="package-card__name">미슐랭 다이닝 나잇</div>
+                    <div class="package-card__desc">셰프 테이블 코스 디너 + 와인 페어링 + 디럭스 1박</div>
+                    <div class="package-card__footer">
+                        <div>
+                            <div class="package-card__price-old">₩650,000</div>
+                            <div class="package-card__price">₩450,000 <span>/ 1박</span></div>
+                        </div>
+                        <div class="package-card__cta">예약 →</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ==================== FACILITY HUB (USR-FAC-001) ==================== -->
+    <div class="section" id="section-facility">
+        <div class="section__header">
+            <div>
+                <div class="section__label">Activity & Dining</div>
+                <h2 class="section__title">부대시설 · 액티비티</h2>
+            </div>
+        </div>
+        <div class="facility-grid">
+            <div class="facility-item" id="fac-dining">
+                <img class="facility-item__bg" src="../images/dining.png" alt="다이닝">
+                <div class="facility-item__overlay"></div>
+                <div class="facility-item__content">
+                    <div class="facility-item__emoji">🍽️</div>
+                    <div class="facility-item__name">다이닝 & F&B</div>
+                    <div class="facility-item__sub">레스토랑 · 바 · 룸서비스</div>
+                </div>
+            </div>
+            <div class="facility-item" id="fac-spa">
+                <img class="facility-item__bg" src="../images/hero_banner.png" alt="웰니스">
+                <div class="facility-item__overlay"></div>
+                <div class="facility-item__content">
+                    <div class="facility-item__emoji">🧖‍♀️</div>
+                    <div class="facility-item__name">스파 & 웰니스</div>
+                    <div class="facility-item__sub">테라피 · 풀 · 사우나</div>
+                </div>
+            </div>
+            <div class="facility-item wide" id="fac-golf-pickup">
+                <img class="facility-item__bg" src="../images/room_suite.png" alt="골프 & 전송">
+                <div class="facility-item__overlay"></div>
+                <div class="facility-item__content">
+                    <div class="facility-item__emoji">⛳</div>
+                    <div class="facility-item__name">골프 · 렌터카 · 공항 픽업</div>
+                    <div class="facility-item__sub">투어 및 전송 서비스 예약</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ==================== CONCIERGE CTA ==================== -->
+    <div class="section" id="section-concierge">
+        <div class="section__header">
+            <div>
+                <div class="section__label">Concierge</div>
+                <h2 class="section__title">무엇이든 도와드릴게요</h2>
+            </div>
+        </div>
+        <div class="concierge-cta" id="concierge-chat">
+            <div class="concierge-cta__icon">
+                <i class="fa-brands fa-rocketchat"></i>
+            </div>
+            <div class="concierge-cta__text">
+                <h4>모바일 컨시어지</h4>
+                <p>실시간 채팅으로 스마트 객실 요청</p>
+            </div>
+            <div class="concierge-cta__badge">Online</div>
+        </div>
+    </div>
+
+    <!-- ==================== BOTTOM TAB BAR (USR-COM-004) ==================== -->
+    <nav class="tab-bar" id="tab-bar">
+        <div class="tab-item active" id="tab-home">
+            <i class="fa-solid fa-house tab-item__icon"></i>
+            <span class="tab-item__label">홈</span>
+        </div>
+        <div class="tab-item" id="tab-promo">
+            <i class="fa-solid fa-gift tab-item__icon"></i>
+            <span class="tab-item__label">프로모션</span>
+        </div>
+        <div class="tab-item tab-item--center" id="tab-booking">
+            <div class="tab-item__icon">
+                <i class="fa-solid fa-plus"></i>
+            </div>
+            <span class="tab-item__label" style="color:var(--color-gold-light);">빠른 예약</span>
+        </div>
+        <div class="tab-item" id="tab-chat">
+            <i class="fa-regular fa-comment-dots tab-item__icon"></i>
+            <span class="tab-item__label">컨시어지 챗</span>
+        </div>
+        <div class="tab-item" id="tab-mypage">
+            <i class="fa-regular fa-user tab-item__icon"></i>
+            <span class="tab-item__label">마이</span>
+        </div>
+    </nav>
+
+    <script>
+        // ==================== GNB Scroll Effect ====================
+        const gnb = document.getElementById('gnb');
+        window.addEventListener('scroll', () => {
+            gnb.classList.toggle('scrolled', window.scrollY > 40);
+        });
+
+        // ==================== Hero Banner Carousel ====================
+        const slides = document.getElementById('heroSlides');
+        const dots = document.querySelectorAll('.hero__dot');
+        let currentSlide = 0;
+        const totalSlides = 3;
+
+        function goToSlide(index) {
+            currentSlide = index;
+            slides.style.transform = `translateX(-${index * 100}%)`;
+            dots.forEach((d, i) => d.classList.toggle('active', i === index));
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => goToSlide(parseInt(dot.dataset.index)));
+        });
+
+        // Auto-play carousel
+        setInterval(() => {
+            goToSlide((currentSlide + 1) % totalSlides);
+        }, 5000);
+
+        // Touch swipe support
+        let touchStartX = 0;
+        const heroEl = document.getElementById('hero-banner');
+        heroEl.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+        heroEl.addEventListener('touchend', e => {
+            const diff = touchStartX - e.changedTouches[0].screenX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) goToSlide(Math.min(currentSlide + 1, totalSlides - 1));
+                else goToSlide(Math.max(currentSlide - 1, 0));
+            }
+        });
+
+        // ==================== Tab Bar Interaction ====================
+        const tabs = document.querySelectorAll('.tab-item');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // ==================== Scroll-Driven Animations ====================
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section, .facility-item, .package-card').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
