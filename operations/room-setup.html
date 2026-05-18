@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>객실/유형 등록 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/operations.css">
+<style>
+/* Building Selection Styles */
+.mobile-bldg-btn { display: none; }
+.mobile-bldg-item { padding: 14px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: var(--txt); background: var(--card); border: 1px solid var(--border); cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; }
+.mobile-bldg-item:hover { background: var(--border2); }
+.mobile-bldg-item.active { border-color: var(--primary); background: var(--primary-lt); color: var(--primary); }
+
+/* Room Grid (Cards) */
+.room-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 10px; }
+.room-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); transition: transform 0.2s, box-shadow 0.2s; }
+.room-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-lt); }
+.room-card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border2); padding-bottom: 12px; }
+.room-card-title { font-size: 1.1rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 6px; }
+.room-card-type { font-size: 0.75rem; font-weight: 600; background: var(--bg); padding: 4px 8px; border-radius: 4px; color: var(--txt2); }
+.room-card-info { display: flex; flex-direction: column; gap: 8px; }
+.room-info-row { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--txt); }
+.room-info-row i { color: var(--txt3); width: 16px; text-align: center; }
+.room-card-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+.td-actions {
+    display: flex;
+    gap: 8px;
+}
+.btn-icon {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 4px;
+    color: var(--txt2);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-icon:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+.btn-icon.delete:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0 12px;
+    height: 38px;
+    width: 260px;
+}
+.search-bar input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: var(--font);
+    font-size: 0.85rem;
+    margin-left: 8px;
+}
+
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.top-actions-right {
+    display: flex;
+    gap: 10px;
+}
+
+/* Toggle switch */
+.toggle-switch{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:12px;transition:background .3s}
+.toggle-slider::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .3s}
+.toggle-switch input:checked+.toggle-slider{background:var(--primary)}
+.toggle-switch input:checked+.toggle-slider::after{transform:translateX(20px)}
+
+/* Add room modal building row */
+.add-room-bldg-row{display:none}
+.add-room-bldg-row.show{display:flex}
+
+@media(max-width:768px){
+    .top-actions { flex-direction: column; align-items: stretch; gap: 10px; }
+    .top-actions-right { width: 100%; display: flex; gap: 8px; flex-wrap: wrap; }
+    .top-actions-right button { flex: 1; justify-content: center; padding: 8px 4px; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 100px; }
+    
+    .filter-left { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100%; gap: 8px !important; align-items: center; }
+    .search-box { flex: 1 1 auto !important; width: auto !important; min-width: 0 !important; }
+    .search-box input { width: 100%; min-width: 0; }
+    
+    .mobile-bldg-btn { display: inline-flex !important; align-items: center; justify-content: center; flex: 0 0 auto !important; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; height: 38px; font-size: 0.85rem; font-weight: 500; color: var(--txt); gap: 6px; white-space: nowrap; }
+    
+    .room-grid { grid-template-columns: 1fr; }
+}
+</style>
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>객실/유형 등록</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="filter-bar" style="margin-bottom: 20px">
+            <div class="filter-left">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="roomSearchInput" placeholder="객실 번호, 타입 검색..." oninput="renderTable()">
+                </div>
+                <div class="desktop-only" style="display:flex;">
+                    <div class="filter-chips" id="buildingChips">
+                        <button class="chip active" onclick="setTab('all')">전체</button>
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+                <button class="btn-outline mobile-bldg-btn" onclick="openModal('mobileBuildingModal')" id="mobileBuildingBtn" style="display: none;">
+                    <i class="fa-solid fa-filter" style="color:var(--txt3)"></i> 전체 <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; margin-left: 2px;"></i>
+                </button>
+            </div>
+            <div class="filter-right top-actions-right">
+                <button class="btn-outline" onclick="openModal('buildingModal')"><i class="fa-solid fa-building"></i> 건물/구역 관리</button>
+                <button class="btn-outline" onclick="openModal('roomTypeModal')"><i class="fa-solid fa-layer-group"></i> 객실 유형 관리</button>
+                <button class="btn-primary-sm" onclick="openModal('addRoomModal')"><i class="fa-solid fa-plus"></i> 신규 객실 등록</button>
+            </div>
+        </div>
+
+        <div class="room-grid" id="roomGrid">
+            <!-- Generated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Building Modal -->
+<div class="modal-overlay" id="mobileBuildingModal" onclick="if(event.target===this) closeModal('mobileBuildingModal')">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 class="modal-title">건물/구역 선택</h3>
+            <button class="modal-close" onclick="closeModal('mobileBuildingModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:16px;display:flex;flex-direction:column;gap:8px" id="mobileBuildingList">
+            <!-- Generated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Building Management Modal -->
+<div class="modal-overlay" id="buildingModal" onclick="if(event.target===this) closeModal('buildingModal')">
+    <div class="modal-card" style="max-width:500px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">건물/구역 관리</h3>
+            <button class="modal-close" onclick="closeModal('buildingModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px;max-height:60vh;overflow-y:auto">
+            <p style="font-size:0.85rem;color:var(--txt2)">호텔의 건물(동) 또는 구역을 관리합니다.</p>
+            <div id="buildingManageList">
+                <!-- Generated by JS -->
+            </div>
+            <button class="btn-outline" style="width:100%;justify-content:center;margin-top:10px" onclick="addBuilding()"><i class="fa-solid fa-plus"></i> 새 건물/구역 추가</button>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('buildingModal')">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- Room Type Management Modal -->
+<div class="modal-overlay" id="roomTypeModal" onclick="if(event.target===this) closeModal('roomTypeModal')">
+    <div class="modal-card" style="max-width:600px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">객실 유형 관리</h3>
+            <button class="modal-close" onclick="closeModal('roomTypeModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px;max-height:60vh;overflow-y:auto">
+            <p style="font-size:0.85rem;color:var(--txt2)">호텔 내 서비스 가능한 객실 유형(Room Type)을 관리하고 편의시설을 설정합니다.</p>
+            
+            <div style="border:1px solid var(--border);border-radius:4px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <div style="font-weight:700">Standard Double</div>
+                    <div style="font-size:0.8rem;color:var(--txt2)">최대 2인 · 킹베드 1개 · 25m²</div>
+                </div>
+                <div><button class="btn-outline-sm">수정</button></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:4px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <div style="font-weight:700">Deluxe King</div>
+                    <div style="font-size:0.8rem;color:var(--txt2)">최대 2인 · 킹베드 1개 · 35m² · 시티뷰</div>
+                </div>
+                <div><button class="btn-outline-sm">수정</button></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:4px;padding:12px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <div style="font-weight:700">Executive Suite</div>
+                    <div style="font-size:0.8rem;color:var(--txt2)">최대 4인 · 킹베드 1개, 소파베드 1개 · 60m² · 오션뷰</div>
+                </div>
+                <div><button class="btn-outline-sm">수정</button></div>
+            </div>
+            
+            <button class="btn-outline" style="width:100%;justify-content:center;margin-top:10px"><i class="fa-solid fa-plus"></i> 새 객실 유형 추가</button>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('roomTypeModal')">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Room Modal -->
+<div class="modal-overlay" id="addRoomModal" onclick="if(event.target===this) closeModal('addRoomModal')">
+    <div class="modal-card" style="max-width:500px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title" id="roomModalTitle">신규 객실 등록</h3>
+            <button class="modal-close" onclick="closeModal('addRoomModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <!-- Building selection -->
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">건물 / 구역</label>
+                <select id="addRoomBuilding" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">객실 번호 <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="addRoomId" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%" placeholder="예: 1208">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">해당 층</label>
+                    <input type="number" id="addRoomFloor" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%" placeholder="예: 12">
+                </div>
+            </div>
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">객실 유형 <span style="color:var(--danger)">*</span></label>
+                    <select id="addRoomType" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                        <option>Standard</option>
+                        <option>Deluxe</option>
+                        <option>Premier</option>
+                        <option>Penthouse</option>
+                        <option>Pool Villa</option>
+                        <option>Garden Villa</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">특이사항 / 메모</label>
+                <textarea style="min-height:60px;border:1px solid var(--border);border-radius:4px;padding:10px;font-family:var(--font);width:100%;resize:vertical" placeholder="전망, 인접 객실 특징 등..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('addRoomModal')">취소</button>
+            <button class="btn-primary-sm" onclick="saveRoom()"><i class="fa-solid fa-check"></i> <span id="saveBtnText">객실 등록</span></button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Mock Room Data (Same as rooms.html)
+let allBuildings = ['Forest Tower', 'Lakeside Villa', 'Ocean Tower'];
+
+let allRooms = [
+    {id:'PH01', floor:20, type:'Penthouse', status:'occupied', building:'Ocean Tower'},
+    {id:'PH02', floor:20, type:'Penthouse', status:'vacant-clean', building:'Ocean Tower'},
+    
+    {id:'1401', floor:14, type:'Premier', status:'vacant-dirty', building:'Ocean Tower'},
+    {id:'1402', floor:14, type:'Premier', status:'occupied', building:'Ocean Tower'},
+    {id:'1403', floor:14, type:'Premier', status:'occupied', building:'Ocean Tower'},
+    {id:'1405', floor:14, type:'Premier', status:'oos', building:'Ocean Tower'},
+    
+    {id:'1201', floor:12, type:'Deluxe', status:'occupied', building:'Forest Tower'},
+    {id:'1202', floor:12, type:'Deluxe', status:'vacant-clean', building:'Forest Tower'},
+    {id:'1203', floor:12, type:'Deluxe', status:'vacant-clean', building:'Forest Tower'},
+    {id:'1205', floor:12, type:'Deluxe', status:'occupied', building:'Forest Tower'},
+    {id:'1206', floor:12, type:'Deluxe', status:'vacant-dirty', building:'Forest Tower'},
+    
+    {id:'0801', floor:8, type:'Standard', status:'occupied', building:'Forest Tower'},
+    {id:'0802', floor:8, type:'Standard', status:'occupied', building:'Forest Tower'},
+    {id:'0803', floor:8, type:'Standard', status:'oos', building:'Forest Tower'},
+    
+    {id:'V-01', floor:1, type:'Pool Villa', status:'occupied', building:'Lakeside Villa'},
+    {id:'V-02', floor:1, type:'Pool Villa', status:'vacant-clean', building:'Lakeside Villa'},
+];
+
+const statusConfig = {
+    'occupied': { label: '투숙 중' },
+    'vacant-clean': { label: '청결 공실' },
+    'vacant-dirty': { label: '오염 공실' },
+    'oos': { label: '점검 중' }
+};
+
+let currentTab = 'all';
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function renderTabs() {
+    const buildings = allBuildings.slice().sort();
+    
+    // Desktop Chips
+    const chipContainer = document.getElementById('buildingChips');
+    let chipHtml = `<button class="chip ${currentTab === 'all' ? 'active' : ''}" onclick="setTab('all')">전체 <span class="chip-count">${allRooms.length}</span></button>`;
+    
+    // Mobile List
+    const mobileContainer = document.getElementById('mobileBuildingList');
+    let mobileHtml = `<button class="mobile-bldg-item ${currentTab === 'all' ? 'active' : ''}" onclick="setTab('all')">전체 <span>${currentTab === 'all' ? '<i class="fa-solid fa-check"></i>' : ''}</span></button>`;
+    
+    // Building Management Select & List
+    const bldgSelect = document.getElementById('addRoomBuilding');
+    const manageList = document.getElementById('buildingManageList');
+    let selectHtml = '<option value="">건물 미지정 (단일 건물)</option>';
+    let manageHtml = '';
+
+    buildings.forEach(b => {
+        const count = allRooms.filter(r => r.building === b).length;
+        chipHtml += `<button class="chip ${currentTab === b ? 'active' : ''}" onclick="setTab('${b}')">${b} <span class="chip-count">${count}</span></button>`;
+        mobileHtml += `<button class="mobile-bldg-item ${currentTab === b ? 'active' : ''}" onclick="setTab('${b}')">${b} <span>${currentTab === b ? '<i class="fa-solid fa-check"></i>' : ''}</span></button>`;
+        
+        selectHtml += `<option value="${b}">${b}</option>`;
+        manageHtml += `
+            <div style="border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+                <div style="font-weight:700">${b}</div>
+                <div style="display:flex;gap:6px">
+                    <button class="btn-outline-sm" onclick="editBuilding('${b}')">수정</button>
+                    <button class="btn-outline-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteBuilding('${b}')">삭제</button>
+                </div>
+            </div>`;
+    });
+    
+    if (chipContainer) chipContainer.innerHTML = chipHtml;
+    if (mobileContainer) mobileContainer.innerHTML = mobileHtml;
+    if (bldgSelect) bldgSelect.innerHTML = selectHtml;
+    if (manageList) manageList.innerHTML = manageHtml;
+    
+    // Update Mobile Button Text
+    const btn = document.getElementById('mobileBuildingBtn');
+    if (btn) btn.innerHTML = `<i class="fa-solid fa-filter" style="color:var(--txt3)"></i> ${currentTab === 'all' ? '전체' : currentTab} <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; margin-left:2px; color:var(--txt3)"></i>`;
+}
+
+function setTab(tab) {
+    currentTab = tab;
+    renderTabs();
+    renderTable();
+    closeModal('mobileBuildingModal');
+}
+
+function addBuilding() {
+    const name = prompt('새 건물/구역의 이름을 입력하세요:');
+    if (name && name.trim()) {
+        const trimmed = name.trim();
+        if (allBuildings.includes(trimmed)) {
+            alert('이미 존재하는 건물/구역명입니다.');
+        } else {
+            allBuildings.push(trimmed);
+            renderTabs();
+        }
+    }
+}
+
+function editBuilding(oldName) {
+    const newName = prompt('건물/구역의 새 이름을 입력하세요:', oldName);
+    if (newName && newName.trim() && newName.trim() !== oldName) {
+        const trimmed = newName.trim();
+        if (allBuildings.includes(trimmed)) {
+            alert('이미 존재하는 건물/구역명입니다.');
+        } else {
+            const idx = allBuildings.indexOf(oldName);
+            if (idx > -1) allBuildings[idx] = trimmed;
+            
+            allRooms.forEach(r => {
+                if (r.building === oldName) r.building = trimmed;
+            });
+            
+            if (currentTab === oldName) currentTab = trimmed;
+            renderTabs();
+            renderTable();
+        }
+    }
+}
+
+function deleteBuilding(name) {
+    const roomsInBuilding = allRooms.filter(r => r.building === name).length;
+    let msg = `'${name}'을(를) 삭제하시겠습니까?`;
+    if (roomsInBuilding > 0) {
+        msg = `'${name}'에 속한 객실이 ${roomsInBuilding}개 있습니다.\\n정말 삭제하시겠습니까? (객실의 건물 정보가 '건물 미지정'으로 변경됩니다)`;
+    }
+    if (confirm(msg)) {
+        allBuildings = allBuildings.filter(b => b !== name);
+        allRooms.forEach(r => {
+            if (r.building === name) r.building = null;
+        });
+        if (currentTab === name) currentTab = 'all';
+        renderTabs();
+        renderTable();
+    }
+}
+
+function renderTable() {
+    const search = document.getElementById('roomSearchInput').value.toLowerCase();
+    const container = document.getElementById('roomGrid');
+    container.innerHTML = '';
+    
+    const filtered = allRooms.filter(r => {
+        if (currentTab !== 'all' && r.building !== currentTab) return false;
+        if (search && !r.id.toLowerCase().includes(search) && !r.type.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding:40px; color:var(--txt3); background:var(--card); border-radius:var(--radius); border:1px solid var(--border)">등록된 객실이 없습니다.</div>';
+        return;
+    }
+
+    filtered.forEach((r, idx) => {
+        const bldgStr = r.building || '건물 미지정';
+        const floorStr = r.floor ? `${r.floor}층` : '-';
+        container.innerHTML += `
+            <div class="room-card">
+                <div class="room-card-header">
+                    <div class="room-card-title"><i class="fa-solid fa-door-closed"></i> ${r.id}</div>
+                    <div class="room-card-type">${r.type}</div>
+                </div>
+                <div class="room-card-info">
+                    <div class="room-info-row"><i class="fa-solid fa-building"></i> ${bldgStr}</div>
+                    <div class="room-info-row"><i class="fa-solid fa-layer-group"></i> ${floorStr}</div>
+                </div>
+                <div class="room-card-actions">
+                    <button class="btn-icon" onclick="editRoom(${idx})" title="수정"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn-icon delete" onclick="deleteRoom(${idx})" title="삭제"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+let editingIdx = -1;
+
+function editRoom(idx) {
+    editingIdx = idx;
+    const r = allRooms[idx];
+    document.getElementById('roomModalTitle').innerText = '객실 정보 수정';
+    document.getElementById('saveBtnText').innerText = '수정 완료';
+    
+    document.getElementById('addRoomId').value = r.id;
+    document.getElementById('addRoomFloor').value = r.floor || '';
+    document.getElementById('addRoomType').value = r.type;
+    document.getElementById('addRoomBuilding').value = r.building || '';
+    
+    openModal('addRoomModal');
+}
+
+// Override openModal for Add Room to clear fields
+const originalOpenModal = openModal;
+openModal = function(id) {
+    if (id === 'addRoomModal' && event && event.currentTarget && event.currentTarget.innerText.includes('신규 객실 등록')) {
+        editingIdx = -1;
+        document.getElementById('roomModalTitle').innerText = '신규 객실 등록';
+        document.getElementById('saveBtnText').innerText = '객실 등록';
+        document.getElementById('addRoomId').value = '';
+        document.getElementById('addRoomFloor').value = '';
+        document.getElementById('addRoomType').value = 'Standard';
+        document.getElementById('addRoomBuilding').value = '';
+    }
+    originalOpenModal(id);
+}
+
+function saveRoom() {
+    const id = document.getElementById('addRoomId').value;
+    const floor = document.getElementById('addRoomFloor').value;
+    const type = document.getElementById('addRoomType').value;
+    const building = document.getElementById('addRoomBuilding').value || null;
+
+    if (!id) {
+        alert('객실 번호를 입력해주세요.');
+        return;
+    }
+
+    if (editingIdx >= 0) {
+        allRooms[editingIdx] = { ...allRooms[editingIdx], id, floor: parseInt(floor)||0, type, building };
+    } else {
+        allRooms.push({ id, floor: parseInt(floor)||0, type, status: 'vacant-clean', building });
+    }
+    
+    closeModal('addRoomModal');
+    renderTabs();
+    renderTable();
+}
+
+function deleteRoom(idx) {
+    if (confirm('이 객실을 삭제하시겠습니까?')) {
+        allRooms.splice(idx, 1);
+        renderTabs();
+        renderTable();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderTabs();
+    renderTable();
+});
+</script>
+
+</body>
+</html>

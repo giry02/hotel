@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>하우스키핑 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/operations.css">
+    <style>
+    .mobile-bldg-item { padding: 14px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; color: var(--txt); background: var(--card); border: 1px solid var(--border); cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .mobile-bldg-item:hover { background: var(--border2); }
+    .mobile-bldg-item.active { border-color: var(--primary); background: var(--primary-lt); color: var(--primary); }
+    .mobile-bldg-item:last-child { margin-bottom: 0; }
+
+    /* Room Filter Card Classes */
+    .rfc-card{background:#fff;border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1px solid var(--border2);box-shadow:0 2px 10px rgba(0,0,0,0.02);transition:all 0.2s}
+    .rfc-left{display:flex;align-items:center;gap:14px}
+    .rfc-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .rfc-info{display:flex;flex-direction:column;gap:4px}
+    .rfc-val{font-size:1.5rem;font-weight:800;color:var(--txt);line-height:1}
+    .rfc-label{font-size:.8rem;font-weight:500;color:var(--txt2)}
+
+    @media(max-width:768px){
+        .filter-left { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; width: 100%; gap: 8px !important; align-items: center; }
+        .search-box { flex: 1 1 auto !important; width: auto !important; min-width: 0 !important; }
+        .search-box input { width: 100%; min-width: 0; }
+        
+        .mobile-filter-btn { display: inline-flex !important; align-items: center; justify-content: center; flex: 0 0 auto !important; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 0 12px; height: 38px; font-size: 0.85rem; font-weight: 500; color: var(--txt); gap: 6px; white-space: nowrap; }
+
+        .kpi-grid{grid-template-columns:1fr 1fr!important;gap:12px!important}
+        .rfc-info{flex-direction:column;align-items:flex-start!important;gap:2px!important}
+        .rfc-val{font-size:1.4rem!important}
+        .rfc-label{font-size:.75rem!important}
+    }
+    @media(max-width:480px){
+        .kpi-grid{gap:8px!important}
+        .rfc-card{padding:12px 10px!important}
+        .rfc-left{gap:8px!important}
+        .rfc-icon{width:36px!important;height:36px!important;font-size:.9rem!important;border-radius:8px!important}
+        .rfc-val{font-size:1.1rem!important}
+        .rfc-label{font-size:.65rem!important}
+        .rfc-card .fa-chevron-right{font-size:.8rem!important}
+    }
+    </style>
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>하우스키핑</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- KPI -->
+        <div class="kpi-grid">
+            <div class="rfc-card" onclick="setFilter(null,'all')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--primary)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--primary-lt);color:var(--primary)"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val" id="kpi-total">24</span>
+                        <span class="rfc-label">전체 작업</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+
+            <div class="rfc-card" onclick="setFilter(null,'dirty')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--warning)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--warning-lt);color:var(--warning)"><i class="fa-solid fa-broom"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val" id="kpi-dirty">8</span>
+                        <span class="rfc-label">청소 대기</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+
+            <div class="rfc-card" onclick="setFilter(null,'inspect')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--purple)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--purple-lt);color:var(--purple)"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val" id="kpi-inspect">2</span>
+                        <span class="rfc-label">점검 대기</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+
+            <div class="rfc-card" onclick="setFilter(null,'clean')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--success)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--success-lt);color:var(--success)"><i class="fa-solid fa-check-double"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val" id="kpi-clean">14</span>
+                        <span class="rfc-label">완료</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-bar">
+            <div class="filter-left">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="객실 번호 검색..." oninput="renderTasks()">
+                </div>
+                <div class="desktop-only" style="display:flex;">
+                    <div class="filter-chips">
+                        <button class="chip active" onclick="setFilter(this,'all')">전체</button>
+                        <button class="chip" onclick="setFilter(this,'dirty')"><span class="status-dot" style="background:var(--warning)"></span> 청소 대기</button>
+                        <button class="chip" onclick="setFilter(this,'inspect')"><span class="status-dot" style="background:var(--purple)"></span> 점검 대기</button>
+                        <button class="chip" onclick="setFilter(this,'clean')"><span class="status-dot" style="background:var(--success)"></span> 완료</button>
+                    </div>
+                </div>
+                <button class="btn-outline mobile-filter-btn" onclick="openModal('mobileFilterModal')" id="mobileFilterBtn" style="display: none;">
+                    <i class="fa-solid fa-filter" style="color:var(--txt3)"></i> 전체 <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; margin-left: 2px;"></i>
+                </button>
+            </div>
+            <div class="filter-right">
+                <button class="btn-outline"><i class="fa-solid fa-print"></i> 작업지시서 출력</button>
+            </div>
+        </div>
+
+        <!-- TASK LIST -->
+        <div class="hk-task-list" id="taskList" style="margin-top:20px">
+            <!-- Generated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Filter Modal -->
+<div class="modal-overlay" id="mobileFilterModal" onclick="if(event.target===this) closeModal('mobileFilterModal')">
+    <div class="modal-card">
+        <div class="modal-header" style="padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center">
+            <h3 style="font-size:1.1rem;font-weight:700">상태 필터</h3>
+            <button class="modal-close" onclick="closeModal('mobileFilterModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:0;display:flex;flex-direction:column;max-height:60vh;overflow-y:auto" id="mobileFilterList">
+            <button class="mobile-bldg-item active" onclick="setFilter(null,'all')">전체 <span class="check-mark"><i class="fa-solid fa-check"></i></span></button>
+            <button class="mobile-bldg-item" onclick="setFilter(null,'dirty')"><div style="display:flex;align-items:center;gap:8px"><span class="status-dot" style="background:var(--warning)"></span> 청소 대기</div> <span class="check-mark"></span></button>
+            <button class="mobile-bldg-item" onclick="setFilter(null,'inspect')"><div style="display:flex;align-items:center;gap:8px"><span class="status-dot" style="background:var(--purple)"></span> 점검 대기</div> <span class="check-mark"></span></button>
+            <button class="mobile-bldg-item" onclick="setFilter(null,'clean')"><div style="display:flex;align-items:center;gap:8px"><span class="status-dot" style="background:var(--success)"></span> 완료</div> <span class="check-mark"></span></button>
+        </div>
+    </div>
+</div>
+
+<script>
+const tasks = [
+    { id:'t1', room:'1401', type:'checkout', status:'dirty', maid: {name:'Mai T.', init:'MT'}, priority:true, note:'VIP 체크인 예정 (14:00)' },
+    { id:'t2', room:'1206', type:'checkout', status:'dirty', maid: {name:'Anna K.', init:'AK'}, priority:false, note:'' },
+    { id:'t3', room:'0807', type:'stayover', status:'dirty', maid: null, priority:false, note:'수건 교체 요청' },
+    { id:'t4', room:'0505', type:'stayover', status:'dirty', maid: {name:'Mai T.', init:'MT'}, priority:false, note:'' },
+    { id:'t5', room:'PH01', type:'checkout', status:'inspect', maid: {name:'Anna K.', init:'AK'}, priority:true, note:'미니바 체크 필요' },
+    { id:'t6', room:'1405', type:'deep', status:'inspect', maid: {name:'Tran V.', init:'TV'}, priority:false, note:'카펫 클리닝 완료' },
+    { id:'t7', room:'1202', type:'checkout', status:'clean', maid: {name:'Mai T.', init:'MT'}, priority:false, note:'' },
+    { id:'t8', room:'1203', type:'checkout', status:'clean', maid: {name:'Anna K.', init:'AK'}, priority:false, note:'' },
+];
+
+const typeMap = {
+    'checkout': { label: '체크아웃 청소', icon: 'fa-door-open' },
+    'stayover': { label: '재실 청소', icon: 'fa-bed' },
+    'deep': { label: '정밀 청소', icon: 'fa-spray-can-sparkles' }
+};
+
+let currentFilter = 'all';
+
+function renderTasks() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const container = document.getElementById('taskList');
+    
+    const filtered = tasks.filter(t => {
+        if (currentFilter !== 'all' && t.status !== currentFilter) return false;
+        if (search && !t.room.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--txt3)">해당하는 작업이 없습니다.</div>';
+        return;
+    }
+
+    container.innerHTML = filtered.map(t => {
+        const typeInfo = typeMap[t.type];
+        
+        let statusHtml = '';
+        let actionBtn = '';
+        
+        if (t.status === 'dirty') {
+            statusHtml = `<span style="color:var(--warning)"><i class="fa-solid fa-broom"></i> 청소 대기</span>`;
+            actionBtn = `<button class="btn-primary-sm" style="background:var(--purple);border-color:var(--purple)" onclick="completeTask('${t.id}', 'inspect')"><i class="fa-solid fa-check"></i> 청소완료 등록</button>`;
+        } else if (t.status === 'inspect') {
+            statusHtml = `<span style="color:var(--purple)"><i class="fa-solid fa-magnifying-glass"></i> 점검 대기</span>`;
+            actionBtn = `<button class="btn-primary-sm" style="background:var(--success);border-color:var(--success)" onclick="completeTask('${t.id}', 'clean')"><i class="fa-solid fa-check-double"></i> 점검완료 등록</button>`;
+        } else {
+            statusHtml = `<span style="color:var(--success)"><i class="fa-solid fa-check-circle"></i> 청소/점검 완료</span>`;
+            actionBtn = `<button class="btn-outline-sm" disabled>완료됨</button>`;
+        }
+
+        const priHtml = t.priority ? `<span class="tier-badge" style="background:var(--danger-lt);color:var(--danger);font-size:0.65rem;margin-left:6px">긴급</span>` : '';
+        const noteHtml = t.note ? `<div style="font-size:0.75rem;color:var(--danger);margin-top:4px"><i class="fa-solid fa-circle-exclamation"></i> ${t.note}</div>` : '';
+        
+        const maidHtml = t.maid 
+            ? `<div class="hk-maid-assign assigned"><div class="hk-maid-avatar">${t.maid.init}</div>${t.maid.name}</div>`
+            : `<div class="hk-maid-assign"><div class="hk-maid-avatar"><i class="fa-solid fa-plus"></i></div>배정 안됨</div>`;
+
+        return `
+        <div class="hk-task ${t.status}">
+            <div class="hk-task-left">
+                <div class="hk-task-room">${t.room}</div>
+                <div class="hk-task-info">
+                    <div class="hk-task-title">
+                        <i class="fa-solid ${typeInfo.icon}" style="color:var(--txt3)"></i> ${typeInfo.label} ${priHtml}
+                    </div>
+                    <div class="hk-task-meta">
+                        ${statusHtml}
+                        <span style="color:var(--border)">|</span>
+                        <span><i class="fa-regular fa-clock"></i> 14:00 마감</span>
+                    </div>
+                    ${noteHtml}
+                </div>
+            </div>
+            <div class="hk-task-right">
+                ${maidHtml}
+                ${actionBtn}
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+const statusMap = {
+    'all': '전체',
+    'dirty': '청소 대기',
+    'inspect': '점검 대기',
+    'clean': '완료'
+};
+
+function updateKpis() {
+    document.getElementById('kpi-total').textContent = tasks.length;
+    document.getElementById('kpi-dirty').textContent = tasks.filter(t => t.status === 'dirty').length;
+    document.getElementById('kpi-inspect').textContent = tasks.filter(t => t.status === 'inspect').length;
+    document.getElementById('kpi-clean').textContent = tasks.filter(t => t.status === 'clean').length;
+}
+
+function completeTask(id, nextStatus) {
+    const task = tasks.find(t => t.id === id);
+    if(task) {
+        task.status = nextStatus;
+        updateKpis();
+        renderTasks();
+    }
+}
+
+function setFilter(btn, status) {
+    currentFilter = status;
+    
+    // Update Desktop Chips
+    document.querySelectorAll('.chip').forEach(c => {
+        if(c.onclick.toString().includes(`'${status}'`)) c.classList.add('active');
+        else c.classList.remove('active');
+    });
+    
+    // Update Mobile Bottom Sheet
+    const mobileItems = document.querySelectorAll('#mobileFilterList .mobile-bldg-item');
+    mobileItems.forEach(item => {
+        if(item.onclick.toString().includes(`'${status}'`)) {
+            item.classList.add('active');
+            const span = item.querySelector('.check-mark');
+            if(span) span.innerHTML = '<i class="fa-solid fa-check"></i>';
+        } else {
+            item.classList.remove('active');
+            const span = item.querySelector('.check-mark');
+            if(span) span.innerHTML = '';
+        }
+    });
+    
+    // Update Mobile Button Text
+    const mBtn = document.getElementById('mobileFilterBtn');
+    if (mBtn) mBtn.innerHTML = `<i class="fa-solid fa-filter" style="color:var(--txt3)"></i> ${statusMap[status]} <i class="fa-solid fa-chevron-down" style="font-size: 0.65rem; margin-left: 2px;"></i>`;
+    
+    closeModal('mobileFilterModal');
+    renderTasks();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+updateKpis();
+renderTasks();
+
+// i18n
+let currentLang='ko';
+const translations={ko:{"하우스키핑":"하우스키핑","대시보드":"대시보드","예약 타임라인":"예약 타임라인","예약 목록":"예약 목록","체크인/아웃":"체크인/아웃","투숙객 관리":"투숙객 관리","VIP 멤버십":"VIP 멤버십","객실 관리":"객실 관리","통합 정산":"통합 정산","부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리","전체 작업":"전체 작업","청소 대기":"청소 대기","점검 대기":"점검 대기","완료":"완료","전체":"전체","청소 요망":"청소 요망","작업지시서 출력":"작업지시서 출력"},en:{"하우스키핑":"Housekeeping","대시보드":"Dashboard","예약 타임라인":"Reservations","예약 목록":"Booking List","체크인/아웃":"Check-in/out","투숙객 관리":"Guest CRM","VIP 멤버십":"VIP Members","객실 관리":"Room Mgmt","통합 정산":"Folio & Billing","부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt","전체 작업":"Total Tasks","청소 대기":"Pending Clean","점검 대기":"To Inspect","완료":"Completed","전체":"All","청소 요망":"Needs Cleaning","작업지시서 출력":"Print Task List"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){
+    currentLang=l;
+    const d=translations[l]||translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]});
+    document.getElementById('searchInput').placeholder=l==='en'?'Search room number...':'객실 번호 검색...';
+    typeMap['checkout'].label = l==='en'?'C/O Clean':'체크아웃 청소';
+    typeMap['stayover'].label = l==='en'?'Stayover Clean':'재실 청소';
+    typeMap['deep'].label = l==='en'?'Deep Clean':'정밀 청소';
+    renderTasks();
+}
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+</body>
+</html>

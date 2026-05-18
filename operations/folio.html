@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합 정산 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>통합 정산 (Folio)</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- PERIOD SELECTOR -->
+        <div class="filter-bar" style="margin-bottom: 20px;">
+            <div class="filter-left" style="flex-wrap:wrap">
+                <div class="filter-chips" style="margin-right:10px">
+                    <button class="chip active" onclick="setKpiPeriod(this, 'day')">금일 (Today)</button>
+                    <button class="chip" onclick="setKpiPeriod(this, 'week')">주별 (Weekly)</button>
+                    <button class="chip" onclick="setKpiPeriod(this, 'month')">월별 (Monthly)</button>
+                    <button class="chip" onclick="setKpiPeriod(this, 'year')">년도별 (Yearly)</button>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center">
+                    <select id="selYear" class="hotel-select" style="display:none;width:100px;height:36px;border:1px solid var(--border);border-radius:4px;padding:0 10px;background:#fff;font-family:var(--font)">
+                        <option>2026년</option>
+                        <option>2025년</option>
+                    </select>
+                    <select id="selMonth" class="hotel-select" style="display:none;width:80px;height:36px;border:1px solid var(--border);border-radius:4px;padding:0 10px;background:#fff;font-family:var(--font)">
+                        <option>5월</option>
+                        <option>4월</option>
+                        <option>3월</option>
+                    </select>
+                    <select id="selWeek" class="hotel-select" style="display:none;width:90px;height:36px;border:1px solid var(--border);border-radius:4px;padding:0 10px;background:#fff;font-family:var(--font)">
+                        <option>2주차</option>
+                        <option>1주차</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-right">
+                <button class="btn-primary-sm"><i class="fa-solid fa-magnifying-glass"></i> 조회</button>
+            </div>
+        </div>
+
+        <!-- KPI -->
+        <div style="font-weight:700; font-size:1.05rem; margin-bottom:12px;"><i class="fa-solid fa-chart-simple" style="color:var(--primary); margin-right:6px"></i>매출 요약</div>
+        <div class="kpi-grid">
+            <div class="kpi-card green"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div></div><div class="kpi-value" id="kpiTotal">$22,970</div><div class="kpi-label">총 매출</div></div>
+            <div class="kpi-card blue"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-bed"></i></div></div><div class="kpi-value" id="kpiRoom">$18,240</div><div class="kpi-label">객실 매출</div></div>
+            <div class="kpi-card purple"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-utensils"></i></div></div><div class="kpi-value" id="kpiAnc">$3,450</div><div class="kpi-label">부가서비스 매출</div></div>
+            <div class="kpi-card orange"><div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-arrow-trend-up"></i></div></div><div class="kpi-value" id="kpiDiff">+12.4%</div><div class="kpi-label">전일 대비</div></div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-bar">
+            <div class="filter-left">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="객실번호, 고객명, Folio 번호 검색..." oninput="renderFolios()">
+                </div>
+                <div class="filter-chips">
+                    <button class="chip active" onclick="setStatus(this,'all')">전체</button>
+                    <button class="chip" onclick="setStatus(this,'unpaid')">미수금 (Unpaid)</button>
+                    <button class="chip" onclick="setStatus(this,'paid')">정산 완료 (Paid)</button>
+                    <button class="chip" onclick="setStatus(this,'refund')">환불/취소</button>
+                </div>
+            </div>
+            <div class="filter-right">
+                <button class="btn-outline"><i class="fa-solid fa-download"></i> 결제 내역 다운로드</button>
+            </div>
+        </div>
+
+        <!-- TABLE (desktop) -->
+        <div class="card desktop-only" style="margin-top:16px">
+            <div class="card-body" style="padding:0">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th>Folio 번호</th><th>객실</th><th>고객</th><th>체크아웃일</th><th>총 금액</th><th>결제액 (보증금)</th><th>미수금 잔액</th><th>상태</th><th>관리</th>
+                    </tr></thead>
+                    <tbody id="folioBody"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARDS (mobile) -->
+        <div class="mobile-cards mobile-only" id="folioMobile"></div>
+    </div>
+</div>
+
+<script>
+const foliosData = {
+    'day': [
+        {id:'FOL-10482', room:'1401', guest:'Tran Linh', out:'2026-05-12', total:1250.00, paid:100.00, bal:1150.00, status:'unpaid'},
+        {id:'FOL-10481', room:'0807', guest:'John Smith', out:'2026-05-12', total:840.50, paid:840.50, bal:0.00, status:'paid'},
+        {id:'FOL-10479', room:'0505', guest:'Garcia Miguel', out:'2026-05-12', total:420.00, paid:420.00, bal:0.00, status:'paid'},
+        {id:'FOL-10475', room:'0802', guest:'Kim Da', out:'2026-05-12', total:350.00, paid:0.00, bal:0.00, status:'refund'}
+    ],
+    'week': [
+        {id:'FOL-10482', room:'1401', guest:'Tran Linh', out:'2026-05-12', total:1250.00, paid:100.00, bal:1150.00, status:'unpaid'},
+        {id:'FOL-10481', room:'0807', guest:'John Smith', out:'2026-05-12', total:840.50, paid:840.50, bal:0.00, status:'paid'},
+        {id:'FOL-10480', room:'1205', guest:'Park Soo', out:'2026-05-13', total:1400.00, paid:100.00, bal:1300.00, status:'unpaid'},
+        {id:'FOL-10479', room:'0505', guest:'Garcia Miguel', out:'2026-05-12', total:420.00, paid:420.00, bal:0.00, status:'paid'},
+        {id:'FOL-10478', room:'1201', guest:'Nguyen Thi', out:'2026-05-14', total:2100.00, paid:100.00, bal:2000.00, status:'unpaid'},
+        {id:'FOL-10475', room:'0802', guest:'Kim Da', out:'2026-05-12', total:350.00, paid:0.00, bal:0.00, status:'refund'},
+        {id:'FOL-10474', room:'0304', guest:'Lee Jin', out:'2026-05-10', total:620.00, paid:620.00, bal:0.00, status:'paid'}
+    ],
+    'month': [
+        {id:'FOL-10482', room:'1401', guest:'Tran Linh', out:'2026-05-12', total:1250.00, paid:100.00, bal:1150.00, status:'unpaid'},
+        {id:'FOL-10481', room:'0807', guest:'John Smith', out:'2026-05-12', total:840.50, paid:840.50, bal:0.00, status:'paid'},
+        {id:'FOL-10480', room:'1205', guest:'Park Soo', out:'2026-05-13', total:1400.00, paid:100.00, bal:1300.00, status:'unpaid'},
+        {id:'FOL-10479', room:'0505', guest:'Garcia Miguel', out:'2026-05-12', total:420.00, paid:420.00, bal:0.00, status:'paid'},
+        {id:'FOL-10478', room:'1201', guest:'Nguyen Thi', out:'2026-05-14', total:2100.00, paid:100.00, bal:2000.00, status:'unpaid'},
+        {id:'FOL-10475', room:'0802', guest:'Kim Da', out:'2026-05-12', total:350.00, paid:0.00, bal:0.00, status:'refund'},
+        {id:'FOL-10474', room:'0304', guest:'Lee Jin', out:'2026-05-10', total:620.00, paid:620.00, bal:0.00, status:'paid'},
+        {id:'FOL-10460', room:'0901', guest:'Alex Wong', out:'2026-05-05', total:1800.00, paid:1800.00, bal:0.00, status:'paid'},
+        {id:'FOL-10452', room:'1102', guest:'Sarah Connor', out:'2026-05-02', total:920.00, paid:920.00, bal:0.00, status:'paid'},
+        {id:'FOL-10440', room:'0705', guest:'Tom Hanks', out:'2026-05-01', total:450.00, paid:450.00, bal:0.00, status:'paid'}
+    ],
+    'year': [
+        {id:'FOL-10482', room:'1401', guest:'Tran Linh', out:'2026-05-12', total:1250.00, paid:100.00, bal:1150.00, status:'unpaid'},
+        {id:'FOL-10481', room:'0807', guest:'John Smith', out:'2026-05-12', total:840.50, paid:840.50, bal:0.00, status:'paid'},
+        {id:'FOL-10480', room:'1205', guest:'Park Soo', out:'2026-05-13', total:1400.00, paid:100.00, bal:1300.00, status:'unpaid'},
+        {id:'FOL-10479', room:'0505', guest:'Garcia Miguel', out:'2026-05-12', total:420.00, paid:420.00, bal:0.00, status:'paid'},
+        {id:'FOL-10478', room:'1201', guest:'Nguyen Thi', out:'2026-05-14', total:2100.00, paid:100.00, bal:2000.00, status:'unpaid'},
+        {id:'FOL-10475', room:'0802', guest:'Kim Da', out:'2026-05-12', total:350.00, paid:0.00, bal:0.00, status:'refund'},
+        {id:'FOL-10474', room:'0304', guest:'Lee Jin', out:'2026-05-10', total:620.00, paid:620.00, bal:0.00, status:'paid'},
+        {id:'FOL-10460', room:'0901', guest:'Alex Wong', out:'2026-05-05', total:1800.00, paid:1800.00, bal:0.00, status:'paid'},
+        {id:'FOL-10452', room:'1102', guest:'Sarah Connor', out:'2026-05-02', total:920.00, paid:920.00, bal:0.00, status:'paid'},
+        {id:'FOL-10440', room:'0705', guest:'Tom Hanks', out:'2026-05-01', total:450.00, paid:450.00, bal:0.00, status:'paid'},
+        {id:'FOL-09820', room:'0502', guest:'Jane Doe', out:'2026-03-15', total:3200.00, paid:3200.00, bal:0.00, status:'paid'},
+        {id:'FOL-09510', room:'1204', guest:'Michael Bay', out:'2026-02-20', total:1500.00, paid:1500.00, bal:0.00, status:'paid'},
+        {id:'FOL-09100', room:'0808', guest:'Tony Stark', out:'2026-01-10', total:5400.00, paid:5400.00, bal:0.00, status:'paid'},
+        {id:'FOL-09050', room:'0601', guest:'Bruce Wayne', out:'2026-01-05', total:2100.00, paid:2100.00, bal:0.00, status:'paid'}
+    ]
+};
+
+const stMap = {
+    'paid': { label:'정산 완료', badge:'success' },
+    'unpaid': { label:'미수금 존재', badge:'warning' },
+    'refund': { label:'환불 처리', badge:'danger' }
+};
+
+let currentStatus = 'all';
+let currentPeriod = 'day';
+
+const kpiData = {
+    'day': { total:'$22,970', room:'$18,240', anc:'$3,450', diff:'+12.4%', label:'전일 대비' },
+    'week': { total:'$164,250', room:'$131,000', anc:'$22,800', diff:'+5.8%', label:'전주 대비' },
+    'month': { total:'$690,000', room:'$560,000', anc:'$95,000', diff:'+18.2%', label:'전월 대비' },
+    'year': { total:'$3,140,000', room:'$2,450,000', anc:'$520,000', diff:'+18.2%', label:'전년 대비' }
+};
+
+function setKpiPeriod(btn, period) {
+    currentPeriod = period;
+    document.querySelectorAll('.filter-bar .chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    document.getElementById('selYear').style.display = (period === 'day') ? 'none' : 'inline-block';
+    document.getElementById('selMonth').style.display = (period === 'week' || period === 'month') ? 'inline-block' : 'none';
+    document.getElementById('selWeek').style.display = (period === 'week') ? 'inline-block' : 'none';
+    
+    document.getElementById('kpiTotal').textContent = kpiData[period].total;
+    document.getElementById('kpiRoom').textContent = kpiData[period].room;
+    document.getElementById('kpiAnc').textContent = kpiData[period].anc;
+    document.getElementById('kpiDiff').textContent = kpiData[period].diff;
+    document.getElementById('kpiDiff').nextElementSibling.textContent = kpiData[period].label;
+    
+    renderFolios();
+}
+
+function renderFolios() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const folios = foliosData[currentPeriod] || [];
+    const filtered = folios.filter(f => {
+        if (currentStatus !== 'all' && f.status !== currentStatus) return false;
+        if (search && !f.id.toLowerCase().includes(search) && !f.room.includes(search) && !f.guest.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    const tbody = document.getElementById('folioBody');
+    const mobile = document.getElementById('folioMobile');
+
+    tbody.innerHTML = filtered.map(f => {
+        const s = stMap[f.status];
+        const balColor = f.bal > 0 ? 'var(--danger)' : 'var(--txt)';
+        return `<tr>
+            <td style="font-family:monospace;color:var(--txt2)">${f.id}</td>
+            <td><strong>${f.room}</strong></td>
+            <td>${f.guest}</td>
+            <td>${f.out}</td>
+            <td>$${f.total.toFixed(2)}</td>
+            <td>$${f.paid.toFixed(2)}</td>
+            <td style="color:${balColor};font-weight:700">$${f.bal.toFixed(2)}</td>
+            <td><span class="status-badge ${s.badge}">${s.label}</span></td>
+            <td><button class="btn-outline-sm" onclick="openModal('invoiceModal')">명세서</button></td>
+        </tr>`;
+    }).join('');
+
+    mobile.innerHTML = filtered.map(f => {
+        const s = stMap[f.status];
+        return `<div class="m-res-card">
+            <div class="m-res-top">
+                <div>
+                    <div style="font-size:0.7rem;color:var(--txt3);font-family:monospace">${f.id}</div>
+                    <div class="m-res-name" style="margin-top:2px">${f.room} · ${f.guest}</div>
+                </div>
+                <div style="text-align:right">
+                    <span class="status-badge ${s.badge}">${s.label}</span>
+                    <div class="m-res-amount" style="color:${f.bal > 0 ? 'var(--danger)' : 'var(--txt)'}">잔여 $${f.bal.toFixed(2)}</div>
+                </div>
+            </div>
+            <div class="m-res-details">
+                <div class="m-res-detail"><i class="fa-solid fa-calendar"></i> 체크아웃: ${f.out}</div>
+                <div class="m-res-detail"><i class="fa-solid fa-money-bill"></i> 총액 $${f.total.toFixed(2)} (기결제 $${f.paid.toFixed(2)})</div>
+            </div>
+            <div class="m-res-actions">
+                <button class="act-btn" onclick="openModal('invoiceModal')"><i class="fa-solid fa-file-invoice"></i> 명세서</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function setStatus(btn, status) {
+    currentStatus = status;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderFolios();
+}
+
+renderFolios();
+
+// i18n
+let currentLang='ko';
+const translations={ko:{"통합 정산 (Folio)":"통합 정산 (Folio)","대시보드":"대시보드","예약 타임라인":"예약 타임라인","예약 목록":"예약 목록","체크인/아웃":"체크인/아웃","투숙객 관리":"투숙객 관리","VIP 멤버십":"VIP 멤버십","객실 관리":"객실 관리","하우스키핑":"하우스키핑","부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리","금일 정산 완료":"금일 정산 완료","미수금 잔액":"미수금 잔액","부가서비스 매출":"부가서비스 매출","카드 결제 비율":"카드 결제 비율","전체":"전체","결제 내역 다운로드":"결제 내역 다운로드","객실":"객실","고객":"고객","체크아웃일":"체크아웃일","총 금액":"총 금액","결제액 (보증금)":"결제액 (보증금)","상태":"상태","관리":"관리"},en:{"통합 정산 (Folio)":"Folio & Billing","대시보드":"Dashboard","예약 타임라인":"Reservations","예약 목록":"Booking List","체크인/아웃":"Check-in/out","투숙객 관리":"Guest CRM","VIP 멤버십":"VIP Members","객실 관리":"Room Mgmt","하우스키핑":"Housekeeping","부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt","금일 정산 완료":"Settled Today","미수금 잔액":"Outstanding Bal","부가서비스 매출":"Ancillary Rev","카드 결제 비율":"Card Payment %","전체":"All","결제 내역 다운로드":"Export Transactions","객실":"Room","고객":"Guest","체크아웃일":"Check-out","총 금액":"Total","결제액 (보증금)":"Paid (Deposit)","상태":"Status","관리":"Actions"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){
+    currentLang=l;
+    const d=translations[l]||translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]});
+    document.getElementById('searchInput').placeholder=l==='en'?'Search room, guest, folio...':'객실번호, 고객명, Folio 번호 검색...';
+    stMap['paid'].label = l==='en'?'Paid':'정산 완료';
+    stMap['unpaid'].label = l==='en'?'Unpaid Bal':'미수금 존재';
+    stMap['refund'].label = l==='en'?'Refunded':'환불 처리';
+    renderFolios();
+}
+// 모달 기능
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function processPayment() {
+    alert('결제가 성공적으로 승인되었습니다.');
+    closeModal('paymentModal');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+
+<!-- 결제 모달 (PAYMENT MODAL) -->
+<div class="modal-overlay" id="paymentModal" onclick="if(event.target===this) closeModal('paymentModal')">
+    <div class="modal-card" style="max-width:400px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">결제 진행 (Payment)</h3>
+            <button class="modal-close" onclick="closeModal('paymentModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div style="background:var(--warning-lt);color:var(--warning);padding:12px;border-radius:4px;text-align:center;font-weight:700;font-size:1.1rem">
+                미수금: $1,150.00
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">결제 수단</label>
+                <select style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                    <option>신용카드 (Credit Card)</option>
+                    <option>현금 (Cash)</option>
+                    <option>계좌이체 (Bank Transfer)</option>
+                </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">결제할 금액</label>
+                <input type="number" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%" value="1150.00">
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('paymentModal')">취소</button>
+            <button class="btn-primary-sm" onclick="processPayment()"><i class="fa-solid fa-credit-card"></i> 승인 및 완료</button>
+        </div>
+    </div>
+</div>
+
+<!-- 명세서 모달 (INVOICE MODAL) -->
+<div class="modal-overlay" id="invoiceModal" onclick="if(event.target===this) closeModal('invoiceModal')">
+    <div class="modal-card" style="max-width:500px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">Folio 명세서</h3>
+            <button class="modal-close" onclick="closeModal('invoiceModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:24px;font-family:monospace;font-size:0.9rem;line-height:1.6;color:var(--txt);background:#fff">
+            <div style="text-align:center;font-weight:700;font-size:1.2rem;margin-bottom:16px;font-family:var(--font)">HOTEL PMS RECEIPT</div>
+            <div>Folio No: FOL-10482</div>
+            <div>Guest Name: Tran Linh</div>
+            <div>Room: 1401</div>
+            <hr style="border:0;border-top:1px dashed var(--border);margin:12px 0">
+            <div style="display:flex;justify-content:space-between"><span>Room Charge (2 Nights)</span><span>$1,200.00</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Room Service</span><span>$50.00</span></div>
+            <hr style="border:0;border-top:1px dashed var(--border);margin:12px 0">
+            <div style="display:flex;justify-content:space-between;font-weight:700"><span>TOTAL</span><span>$1,250.00</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Paid Deposit</span><span>-$100.00</span></div>
+            <div style="display:flex;justify-content:space-between;color:var(--danger);font-weight:700;margin-top:8px"><span>BALANCE DUE</span><span>$1,150.00</span></div>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('invoiceModal')">닫기</button>
+            <button class="btn-primary-sm" onclick="window.print()"><i class="fa-solid fa-print"></i> 명세서 인쇄</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

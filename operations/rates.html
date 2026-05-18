@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>요금 캘린더 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/operations.css">
+    <style>
+        .calendar-wrapper { width:100%; overflow-x:auto; background:#fff; border-radius:var(--radius-lg); border:1px solid var(--border); }
+        .rate-table { width:100%; min-width:1000px; border-collapse:collapse; text-align:center; font-family:var(--font); font-size:0.85rem; }
+        .rate-table th { background:var(--bg); border:1px solid var(--border); padding:10px; font-weight:600; color:var(--txt2); }
+        .rate-table td { border:1px solid var(--border); padding:8px; vertical-align:middle; cursor:pointer; transition:all 0.1s; }
+        .rate-table td:hover { background:var(--primary-lt); }
+        .room-type-col { text-align:left; font-weight:700; background:var(--bg); width:200px; padding:10px 16px !important; }
+        .rate-input { width:100%; border:none; background:transparent; text-align:center; font-family:var(--font); font-size:0.9rem; outline:none; font-weight:600; }
+        .rate-input:focus { color:var(--primary); }
+        .weekend { background:#F8FAFC; color:var(--danger); }
+        .mobile-warning { display:none; padding:40px 20px; text-align:center; color:var(--txt2); font-weight:600; }
+        
+        @media (max-width: 768px) {
+            .calendar-wrapper { display:none; }
+            .mobile-warning { display:block; }
+            .filter-bar { display:none; }
+        }
+    </style>
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>요금 캘린더 (Rates)</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="mobile-warning">
+            <i class="fa-solid fa-desktop" style="font-size:3rem;color:var(--txt3);margin-bottom:16px"></i><br>
+            <span data-i18n-key="PC 전용 메뉴">요금 캘린더는 넓은 데이터 스프레드시트 구조를 사용하므로 데스크톱(PC) 화면에서만 이용할 수 있습니다.</span>
+        </div>
+
+        <div class="filter-bar">
+            <div class="filter-left">
+                <select class="form-control" style="height:36px;border:1px solid var(--border);border-radius:4px;padding:0 10px"><option>2026년 5월</option><option>2026년 6월</option></select>
+            </div>
+            <div class="filter-right">
+                <button class="btn-outline" onclick="openModal('vipDiscountModal')"><i class="fa-solid fa-crown"></i> VIP 할인율 설정</button>
+                <button class="btn-primary-sm" onclick="alert('저장되었습니다.')"><i class="fa-solid fa-check"></i> 요금 저장</button>
+            </div>
+        </div>
+
+        <div class="calendar-wrapper" style="margin-top:16px">
+            <table class="rate-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="room-type-col">객실 유형</th>
+                        <th colspan="7">5월 1주차</th>
+                        <th colspan="7">5월 2주차</th>
+                    </tr>
+                    <tr>
+                        <th>1 (금)</th><th class="weekend">2 (토)</th><th class="weekend">3 (일)</th><th>4 (월)</th><th>5 (화)</th><th>6 (수)</th><th>7 (목)</th>
+                        <th>8 (금)</th><th class="weekend">9 (토)</th><th class="weekend">10 (일)</th><th>11 (월)</th><th>12 (화)</th><th>13 (수)</th><th>14 (목)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="room-type-col">Standard Double</td>
+                        <td><input type="text" class="rate-input" value="$120"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$150"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$140"></td>
+                        <td><input type="text" class="rate-input" value="$110"></td>
+                        <td><input type="text" class="rate-input" value="$110"></td>
+                        <td><input type="text" class="rate-input" value="$110"></td>
+                        <td><input type="text" class="rate-input" value="$120"></td>
+                        
+                        <td><input type="text" class="rate-input" value="$120"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$150"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$140"></td>
+                        <td><input type="text" class="rate-input" value="$110"></td>
+                        <td><input type="text" class="rate-input" value="$110"></td>
+                        <td><input type="text" class="rate-input" value="$110"></td>
+                        <td><input type="text" class="rate-input" value="$120"></td>
+                    </tr>
+                    <tr>
+                        <td class="room-type-col">Deluxe King</td>
+                        <td><input type="text" class="rate-input" value="$180"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$220"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$200"></td>
+                        <td><input type="text" class="rate-input" value="$160"></td>
+                        <td><input type="text" class="rate-input" value="$160"></td>
+                        <td><input type="text" class="rate-input" value="$160"></td>
+                        <td><input type="text" class="rate-input" value="$180"></td>
+                        
+                        <td><input type="text" class="rate-input" value="$180"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$220"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$200"></td>
+                        <td><input type="text" class="rate-input" value="$160"></td>
+                        <td><input type="text" class="rate-input" value="$160"></td>
+                        <td><input type="text" class="rate-input" value="$160"></td>
+                        <td><input type="text" class="rate-input" value="$180"></td>
+                    </tr>
+                    <tr>
+                        <td class="room-type-col">Executive Suite</td>
+                        <td><input type="text" class="rate-input" value="$350"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$400"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$400"></td>
+                        <td><input type="text" class="rate-input" value="$300"></td>
+                        <td><input type="text" class="rate-input" value="$300"></td>
+                        <td><input type="text" class="rate-input" value="$300"></td>
+                        <td><input type="text" class="rate-input" value="$350"></td>
+                        
+                        <td><input type="text" class="rate-input" value="$350"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$400"></td>
+                        <td class="weekend"><input type="text" class="rate-input" value="$400"></td>
+                        <td><input type="text" class="rate-input" value="$300"></td>
+                        <td><input type="text" class="rate-input" value="$300"></td>
+                        <td><input type="text" class="rate-input" value="$300"></td>
+                        <td><input type="text" class="rate-input" value="$350"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- VIP Discount Modal -->
+<div class="modal-overlay" id="vipDiscountModal" onclick="if(event.target===this) closeModal('vipDiscountModal')">
+    <div class="modal-card" style="max-width:400px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">VIP 자동 할인율 설정</h3>
+            <button class="modal-close" onclick="closeModal('vipDiscountModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <p style="font-size:0.85rem;color:var(--txt2)">고객 등급에 따라 예약 시 자동으로 적용될 할인율(%)을 지정합니다.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-weight:600;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#E2E8F0"></span> Standard</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <input type="number" style="height:34px;width:80px;border:1px solid var(--border);border-radius:4px;text-align:right;padding-right:10px" value="0"> 
+                    <span style="font-weight:600;color:var(--txt2)">%</span>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-weight:600;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#94A3B8"></span> Silver</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <input type="number" style="height:34px;width:80px;border:1px solid var(--border);border-radius:4px;text-align:right;padding-right:10px" value="5">
+                    <span style="font-weight:600;color:var(--txt2)">%</span>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-weight:600;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#F59E0B"></span> Gold</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <input type="number" style="height:34px;width:80px;border:1px solid var(--border);border-radius:4px;text-align:right;padding-right:10px" value="10">
+                    <span style="font-weight:600;color:var(--txt2)">%</span>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-weight:600;display:flex;align-items:center;gap:8px"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#8B5CF6"></span> VIP</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <input type="number" style="height:34px;width:80px;border:1px solid var(--border);border-radius:4px;text-align:right;padding-right:10px" value="20">
+                    <span style="font-weight:600;color:var(--txt2)">%</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('vipDiscountModal')">취소</button>
+            <button class="btn-primary-sm" onclick="closeModal('vipDiscountModal')"><i class="fa-solid fa-check"></i> 변경사항 저장</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// i18n
+let currentLang='ko';
+const translations={ko:{"요금 캘린더":"요금 캘린더","객실 관리":"객실 관리","통합 정산":"통합 정산","부가서비스":"부가서비스","요금 캘린더 (Rates)":"요금 캘린더 (Rates)","VIP 할인율 설정":"VIP 할인율 설정","요금 저장":"요금 저장","객실 유형":"객실 유형","5월 1주차":"5월 1주차","5월 2주차":"5월 2주차","1 (금)":"1 (금)","2 (토)":"2 (토)","3 (일)":"3 (일)","4 (월)":"4 (월)","5 (화)":"5 (화)","6 (수)":"6 (수)","7 (목)":"7 (목)","8 (금)":"8 (금)","9 (토)":"9 (토)","10 (일)":"10 (일)","11 (월)":"11 (월)","12 (화)":"12 (화)","13 (수)":"13 (수)","14 (목)":"14 (목)","VIP 자동 할인율 설정":"VIP 자동 할인율 설정","고객 등급에 따라 예약 시 자동으로 적용될 할인율(%)을 지정합니다.":"고객 등급에 따라 예약 시 자동으로 적용될 할인율(%)을 지정합니다.","취소":"취소","변경사항 저장":"변경사항 저장"},en:{"요금 캘린더":"Rates Calendar","객실 관리":"Room Mgmt","통합 정산":"Folio & Billing","부가서비스":"Ancillary","PC 전용 메뉴":"Rate Calendar uses a wide spreadsheet interface and is available on Desktop only.","요금 캘린더 (Rates)":"Rates Calendar","VIP 할인율 설정":"VIP Discounts","요금 저장":"Save Rates","객실 유형":"Room Type","5월 1주차":"May Week 1","5월 2주차":"May Week 2","1 (금)":"1 (Fri)","2 (토)":"2 (Sat)","3 (일)":"3 (Sun)","4 (월)":"4 (Mon)","5 (화)":"5 (Tue)","6 (수)":"6 (Wed)","7 (목)":"7 (Thu)","8 (금)":"8 (Fri)","9 (토)":"9 (Sat)","10 (일)":"10 (Sun)","11 (월)":"11 (Mon)","12 (화)":"12 (Tue)","13 (수)":"13 (Wed)","14 (목)":"14 (Thu)","VIP 자동 할인율 설정":"Auto VIP Discounts","고객 등급에 따라 예약 시 자동으로 적용될 할인율(%)을 지정합니다.":"Set automatic discount rates (%) applied during booking based on guest tier.","취소":"Cancel","변경사항 저장":"Save Changes"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){
+    currentLang=l;
+    const d=translations[l]||translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]});
+}
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+</body>
+</html>

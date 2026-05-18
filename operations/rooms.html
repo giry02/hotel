@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>객실 관리 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/operations.css">
+<style>
+/* Mobile filter trigger */
+.m-filter-trigger{display:none;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:.75rem;font-weight:600;color:var(--txt);cursor:pointer;font-family:var(--font);align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;width:140px}
+.m-filter-trigger i{font-size:.65rem;color:var(--txt3)}
+.m-filter-trigger span{flex:1;text-align:left}
+
+/* Bottom sheet */
+.bottom-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}
+.bottom-sheet-overlay.active{opacity:1;pointer-events:auto}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#fff;border-radius:16px 16px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:60vh;box-shadow:0 -4px 30px rgba(0,0,0,.15)}
+.bottom-sheet.active{transform:translateY(0)}
+.bottom-sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 0}
+.bottom-sheet-title{padding:16px 20px 8px;font-size:.88rem;font-weight:700;color:var(--txt)}
+.bottom-sheet-options{padding:0 12px 20px}
+.bs-option{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);font-size:.82rem;color:var(--txt)}
+.bs-option:hover,.bs-option:active{background:var(--border2)}
+.bs-option.selected{background:rgba(99,102,241,.06);color:var(--primary);font-weight:700}
+.bs-option-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.bs-option-check{margin-left:auto;font-size:.8rem;color:var(--primary);opacity:0}
+.bs-option.selected .bs-option-check{opacity:1}
+.bs-option-label{flex:1}
+.bs-option-desc{font-size:.68rem;color:var(--txt3);font-weight:400;margin-top:2px}
+
+@media(max-width:768px){
+    .m-filter-trigger{display:flex}
+    .filter-chips{display:none!important}
+    .filter-left{flex-direction:row!important;gap:8px!important;flex-wrap:nowrap!important;align-items:center!important}
+    .filter-left .search-box{flex:1;min-width:0;width:auto!important}
+    .kpi-grid{grid-template-columns:1fr 1fr!important;gap:12px!important}
+    .rfc-info{flex-direction:column;align-items:flex-start!important;gap:2px!important}
+    .rfc-val{font-size:1.4rem!important}
+    .rfc-label{font-size:.75rem!important}
+}
+@media(max-width:480px){
+    .kpi-grid{gap:8px!important}
+    .rfc-card{padding:12px 10px!important}
+    .rfc-left{gap:8px!important}
+    .rfc-icon{width:36px!important;height:36px!important;font-size:.9rem!important;border-radius:8px!important}
+    .rfc-val{font-size:1.1rem!important}
+    .rfc-label{font-size:.65rem!important}
+    .rfc-card .fa-chevron-right{font-size:.8rem!important}
+}
+
+/* Room Filter Card Classes */
+.rfc-card{background:#fff;border-radius:16px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:1px solid var(--border2);box-shadow:0 2px 10px rgba(0,0,0,0.02);transition:all 0.2s}
+.rfc-left{display:flex;align-items:center;gap:14px}
+.rfc-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.rfc-info{display:flex;align-items:baseline;gap:8px}
+.rfc-val{font-size:1.6rem;font-weight:800;color:var(--txt);line-height:1}
+.rfc-label{font-size:.85rem;font-weight:600;color:var(--txt2)}
+
+/* Toggle switch */
+.toggle-switch{position:relative;width:44px;height:24px;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:12px;transition:background .3s}
+.toggle-slider::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .3s}
+.toggle-switch input:checked+.toggle-slider{background:var(--primary)}
+.toggle-switch input:checked+.toggle-slider::after{transform:translateX(20px)}
+
+/* Building section header (auto-rendered) */
+.building-section{margin-bottom:8px}
+.building-header{display:flex;align-items:center;gap:10px;padding:14px 0 8px;cursor:pointer;user-select:none}
+.building-header i.bldg-icon{font-size:1rem;color:var(--primary);width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--primary-lt);border-radius:6px}
+.building-header .bldg-name{font-size:1.05rem;font-weight:700;color:var(--txt)}
+.building-header .bldg-count{font-size:.78rem;color:var(--txt3);font-weight:500;margin-left:4px}
+.building-header .bldg-chevron{margin-left:auto;color:var(--txt3);font-size:.8rem;transition:transform .2s}
+.building-header.collapsed .bldg-chevron{transform:rotate(-90deg)}
+.building-body{padding-left:0}
+.building-body.collapsed{display:none}
+
+/* Add room modal building row */
+.add-room-bldg-row{display:none}
+.add-room-bldg-row.show{display:flex}
+</style>
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>객실 관리</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- KPI -->
+        <div class="kpi-grid">
+            <div class="rfc-card" onclick="selectFilter('all','전체')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--primary)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--primary-lt);color:var(--primary)"><i class="fa-solid fa-bed"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val">120</span>
+                        <span class="rfc-label">총 객실</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+            
+            <div class="rfc-card" onclick="selectFilter('occupied','투숙 중')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--success)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--success-lt);color:var(--success)"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val">99</span>
+                        <span class="rfc-label">투숙 객실</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+            
+            <div class="rfc-card" onclick="selectFilter('vacant','공실')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--warning)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--warning-lt);color:var(--warning)"><i class="fa-solid fa-door-open"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val">18</span>
+                        <span class="rfc-label">공실 (Vacant)</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+            
+            <div class="rfc-card" onclick="selectFilter('oos','점검 중 (OOS)')" onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='var(--purple)'" onmouseout="this.style.transform='translateY(0)';this.style.borderColor='var(--border2)'">
+                <div class="rfc-left">
+                    <div class="rfc-icon" style="background:var(--purple-lt);color:var(--purple)"><i class="fa-solid fa-wrench"></i></div>
+                    <div class="rfc-info">
+                        <span class="rfc-val">3</span>
+                        <span class="rfc-label">점검 중 (OOS)</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="color:var(--txt3);font-size:1rem;transition:transform 0.2s"></i>
+            </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-bar">
+            <div class="filter-left">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="객실 번호 검색..." oninput="renderRooms()">
+                </div>
+                <div class="filter-chips">
+                    <button class="chip active" onclick="setStatus(this,'all')">전체</button>
+                    <button class="chip" onclick="setStatus(this,'occupied')"><span class="status-dot" style="background:var(--primary)"></span> 투숙 중</button>
+                    <button class="chip" onclick="setStatus(this,'vacant-clean')"><span class="status-dot" style="background:var(--success)"></span> 청결 공실</button>
+                    <button class="chip" onclick="setStatus(this,'vacant-dirty')"><span class="status-dot" style="background:var(--warning)"></span> 오염 공실</button>
+                    <button class="chip" onclick="setStatus(this,'oos')"><span class="status-dot" style="background:var(--danger)"></span> 점검 중 (OOS)</button>
+                </div>
+                <button class="m-filter-trigger" onclick="openBottomSheet()">
+                    <i class="fa-solid fa-filter"></i>
+                    <span id="mFilterLabel">전체</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="filter-right">
+                <button class="btn-outline"><i class="fa-solid fa-download"></i> 엑셀 다운</button>
+            </div>
+        </div>
+
+        <!-- ROOM GRID -->
+        <div id="roomContainer" style="margin-top:20px">
+            <!-- Generated by JS -->
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Sheet -->
+<div class="bottom-sheet-overlay" id="bsOverlay" onclick="closeBottomSheet()"></div>
+<div class="bottom-sheet" id="bsPanel">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-title">객실 상태 선택</div>
+    <div class="bottom-sheet-options">
+        <button class="bs-option selected" onclick="selectFilter('all','전체')">
+            <div class="bs-option-icon" style="background:var(--border2);color:var(--txt2)"><i class="fa-solid fa-bed"></i></div>
+            <div class="bs-option-label">전체<div class="bs-option-desc">모든 객실 상태 표시</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('occupied','투숙 중')">
+            <div class="bs-option-icon" style="background:rgba(59,130,246,.1);color:var(--primary)"><i class="fa-solid fa-user-check"></i></div>
+            <div class="bs-option-label">투숙 중<div class="bs-option-desc">고객이 투숙 중인 객실</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('vacant-clean','청결 공실')">
+            <div class="bs-option-icon" style="background:rgba(16,185,129,.1);color:var(--success)"><i class="fa-solid fa-broom"></i></div>
+            <div class="bs-option-label">청결 공실<div class="bs-option-desc">청소 완료, 체크인 가능</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('vacant-dirty','오염 공실')">
+            <div class="bs-option-icon" style="background:rgba(245,158,11,.1);color:var(--warning)"><i class="fa-solid fa-trash"></i></div>
+            <div class="bs-option-label">오염 공실<div class="bs-option-desc">체크아웃 후 청소 필요</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('oos','점검 중 (OOS)')">
+            <div class="bs-option-icon" style="background:rgba(239,68,68,.1);color:var(--danger)"><i class="fa-solid fa-wrench"></i></div>
+            <div class="bs-option-label">점검 중 (OOS)<div class="bs-option-desc">수리/유지보수 필요</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+// Mock Room Data — building field is optional (null = no building)
+const allRooms = [
+    {id:'PH01', floor:20, type:'Penthouse', status:'occupied', guest:'Tran Linh', building:'Ocean Tower'},
+    {id:'PH02', floor:20, type:'Penthouse', status:'vacant-clean', guest:'', building:'Ocean Tower'},
+    
+    {id:'1401', floor:14, type:'Premier', status:'vacant-dirty', guest:'', building:'Ocean Tower'},
+    {id:'1402', floor:14, type:'Premier', status:'occupied', guest:'Lee Hana', building:'Ocean Tower'},
+    {id:'1403', floor:14, type:'Premier', status:'occupied', guest:'Smith J.', building:'Ocean Tower'},
+    {id:'1405', floor:14, type:'Premier', status:'oos', guest:'', building:'Ocean Tower'},
+    
+    {id:'1201', floor:12, type:'Deluxe', status:'occupied', guest:'Nguyen Thi', building:'Forest Tower'},
+    {id:'1202', floor:12, type:'Deluxe', status:'vacant-clean', guest:'', building:'Forest Tower'},
+    {id:'1203', floor:12, type:'Deluxe', status:'vacant-clean', guest:'', building:'Forest Tower'},
+    {id:'1205', floor:12, type:'Deluxe', status:'occupied', guest:'Park Soo', building:'Forest Tower'},
+    {id:'1206', floor:12, type:'Deluxe', status:'vacant-dirty', guest:'', building:'Forest Tower'},
+    
+    {id:'0801', floor:8, type:'Standard', status:'occupied', guest:'Chen Wei', building:'Forest Tower'},
+    {id:'0802', floor:8, type:'Standard', status:'occupied', guest:'Kim Da', building:'Forest Tower'},
+    {id:'0803', floor:8, type:'Standard', status:'oos', guest:'', building:'Forest Tower'},
+    {id:'0805', floor:8, type:'Standard', status:'vacant-clean', guest:'', building:'Forest Tower'},
+    {id:'0806', floor:8, type:'Standard', status:'occupied', guest:'Tanaka Y.', building:'Forest Tower'},
+    {id:'0807', floor:8, type:'Standard', status:'vacant-dirty', guest:'', building:'Forest Tower'},
+    
+    {id:'V-01', floor:1, type:'Pool Villa', status:'occupied', guest:'Garcia M.', building:'Lakeside Villa'},
+    {id:'V-02', floor:1, type:'Pool Villa', status:'vacant-clean', guest:'', building:'Lakeside Villa'},
+    {id:'V-03', floor:1, type:'Garden Villa', status:'occupied', guest:'Bui Tien', building:'Lakeside Villa'},
+    {id:'V-04', floor:1, type:'Garden Villa', status:'vacant-dirty', guest:'', building:'Lakeside Villa'},
+];
+
+const statusConfig = {
+    'occupied': { label: '투숙 중' },
+    'vacant-clean': { label: '청결 공실' },
+    'vacant-dirty': { label: '오염 공실' },
+    'oos': { label: '점검 중' }
+};
+
+let currentStatus = 'all';
+
+function toggleBuilding(el) {
+    el.classList.toggle('collapsed');
+    el.nextElementSibling.classList.toggle('collapsed');
+}
+
+function renderRooms() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const container = document.getElementById('roomContainer');
+    container.innerHTML = '';
+    
+    const filtered = allRooms.filter(r => {
+        if (currentStatus !== 'all') {
+            if (currentStatus === 'vacant' && r.status !== 'vacant-clean' && r.status !== 'vacant-dirty') return false;
+            else if (currentStatus !== 'vacant' && r.status !== currentStatus) return false;
+        }
+        if (search && !r.id.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--txt3)">검색 결과가 없습니다.</div>';
+        return;
+    }
+
+    // Auto-detect: if any room has a building value, use building>floor grouping
+    const hasBuildings = allRooms.some(r => r.building);
+
+    if (hasBuildings) {
+        // 2-level grouping: Building > Floor
+        const buildings = [...new Set(filtered.map(r => r.building || '미지정'))].sort();
+        buildings.forEach(bldg => {
+            const bldgRooms = filtered.filter(r => (r.building || '미지정') === bldg);
+            const floors = [...new Set(bldgRooms.map(r => r.floor))].sort((a,b) => b - a);
+            let html = `<div class="building-section">`;
+            html += `<div class="building-header" onclick="toggleBuilding(this)">`;
+            html += `<i class="fa-solid fa-building bldg-icon"></i>`;
+            html += `<span class="bldg-name">${bldg}</span>`;
+            html += `<span class="bldg-count">(${bldgRooms.length}객실)</span>`;
+            html += `<i class="fa-solid fa-chevron-down bldg-chevron"></i>`;
+            html += `</div>`;
+            html += `<div class="building-body">`;
+            floors.forEach(f => {
+                const floorRooms = bldgRooms.filter(r => r.floor === f);
+                html += `<div class="floor-section">`;
+                html += `<div class="floor-title"><i class="fa-solid fa-layer-group"></i> ${f}층 <span style="font-size:0.8rem;color:var(--txt3);font-weight:500;margin-left:8px">(${floorRooms.length}객실)</span></div>`;
+                html += `<div class="room-grid">`;
+                floorRooms.forEach(r => {
+                    const stLabel = statusConfig[r.status].label;
+                    const guestHtml = r.guest ? `<div class="room-guest-name">${r.guest}</div>` : '';
+                    html += `<div class="room-box ${r.status}"><div class="room-box-num">${r.id}</div><div class="room-box-type">${r.type}</div><div class="room-box-status">${stLabel}</div>${guestHtml}</div>`;
+                });
+                html += `</div></div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+    } else {
+        // Single-level grouping: Floor only
+        const floors = [...new Set(filtered.map(r => r.floor))].sort((a,b) => b - a);
+        floors.forEach(f => {
+            const floorRooms = filtered.filter(r => r.floor === f);
+            let html = `<div class="floor-section">`;
+            html += `<div class="floor-title"><i class="fa-solid fa-layer-group"></i> ${f}층 <span style="font-size:0.8rem;color:var(--txt3);font-weight:500;margin-left:8px">(${floorRooms.length}객실)</span></div>`;
+            html += `<div class="room-grid">`;
+            floorRooms.forEach(r => {
+                const stLabel = statusConfig[r.status].label;
+                const guestHtml = r.guest ? `<div class="room-guest-name">${r.guest}</div>` : '';
+                html += `<div class="room-box ${r.status}"><div class="room-box-num">${r.id}</div><div class="room-box-type">${r.type}</div><div class="room-box-status">${stLabel}</div>${guestHtml}</div>`;
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+    }
+}
+
+function setStatus(btn, status) {
+    currentStatus = status;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderRooms();
+}
+
+// Bottom sheet
+function openBottomSheet() {
+    document.getElementById('bsOverlay').classList.add('active');
+    document.getElementById('bsPanel').classList.add('active');
+}
+function closeBottomSheet() {
+    document.getElementById('bsOverlay').classList.remove('active');
+    document.getElementById('bsPanel').classList.remove('active');
+}
+function selectFilter(status, label) {
+    currentStatus = status;
+    // Update bottom sheet selected state
+    document.querySelectorAll('.bs-option').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('.bs-option').forEach(o => {
+        if (o.getAttribute('onclick').includes(`'${status}'`)) o.classList.add('selected');
+    });
+    // Update mobile trigger label
+    document.getElementById('mFilterLabel').textContent = label;
+    // Sync desktop chips
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    const chips = document.querySelectorAll('.chip');
+    if (status === 'all') chips[0].classList.add('active');
+    else if (status === 'occupied') chips[1].classList.add('active');
+    else if (status === 'vacant-clean') chips[2].classList.add('active');
+    else if (status === 'vacant-dirty') chips[3].classList.add('active');
+    else if (status === 'oos') chips[4].classList.add('active');
+    // If 'vacant' is selected, no chip perfectly matches, so we leave them inactive
+    // to indicate a combined filter state, or we could select both vacant chips if we wanted.
+    
+    closeBottomSheet();
+    renderRooms();
+}
+
+function saveRoom() {
+    alert('신규 객실이 등록되었습니다.');
+    closeModal('addRoomModal');
+}
+
+renderRooms();
+
+// i18n
+let currentLang='ko';
+const translations={ko:{"객실 관리":"객실 관리","대시보드":"대시보드","예약 타임라인":"예약 타임라인","예약 목록":"예약 목록","체크인/아웃":"체크인/아웃","투숙객 관리":"투숙객 관리","VIP 멤버십":"VIP 멤버십","하우스키핑":"하우스키핑","통합 정산":"통합 정산","부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리","총 객실":"총 객실","투숙 객실":"투숙 객실","공실 (Vacant)":"공실 (Vacant)","점검 중 (OOS)":"점검 중 (OOS)","전체":"전체","투숙 중":"투숙 중","청결 공실":"청결 공실","오염 공실":"오염 공실","점검 중":"점검 중","엑셀 다운":"엑셀 다운","객실 유형 관리":"객실 유형 관리","신규 객실 등록":"신규 객실 등록","객실 등록":"객실 등록"},en:{"객실 관리":"Room Mgmt","대시보드":"Dashboard","예약 타임라인":"Reservations","예약 목록":"Booking List","체크인/아웃":"Check-in/out","투숙객 관리":"Guest CRM","VIP 멤버십":"VIP Members","하우스키핑":"Housekeeping","통합 정산":"Folio & Billing","부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt","총 객실":"Total Rooms","투숙 객실":"Occupied","공실 (Vacant)":"Vacant","점검 중 (OOS)":"OOS","전체":"All","투숙 중":"Occupied","청결 공실":"Vacant Clean","오염 공실":"Vacant Dirty","점검 중":"Out of Order","엑셀 다운":"Export","객실 유형 관리":"Room Types","신규 객실 등록":"Add Room","객실 등록":"Add Room"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){
+    currentLang=l;
+    const d=translations[l]||translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]});
+    document.getElementById('searchInput').placeholder=l==='en'?'Search room number...':'객실 번호 검색...';
+    // Update JS rendered labels
+    statusConfig['occupied'].label = l==='en'?'Occupied':'투숙 중';
+    statusConfig['vacant-clean'].label = l==='en'?'Vacant Clean':'청결 공실';
+    statusConfig['vacant-dirty'].label = l==='en'?'Vacant Dirty':'오염 공실';
+    statusConfig['oos'].label = l==='en'?'Out of Order':'점검/수리중';
+    renderRooms();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+
+</body>
+</html>
