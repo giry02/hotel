@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>등급 변동 이력 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/crm.css">
+<style>
+/* Mobile filter trigger */
+.m-filter-trigger{display:none;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:.75rem;font-weight:600;color:var(--txt);cursor:pointer;font-family:var(--font);align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;width:100px}
+.m-filter-trigger i{font-size:.65rem;color:var(--txt3)}
+.m-filter-trigger span{flex:1;text-align:left}
+
+/* Bottom sheet */
+.bottom-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}
+.bottom-sheet-overlay.active{opacity:1;pointer-events:auto}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#fff;border-radius:16px 16px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:60vh;box-shadow:0 -4px 30px rgba(0,0,0,.15)}
+.bottom-sheet.active{transform:translateY(0)}
+.bottom-sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 0}
+.bottom-sheet-title{padding:16px 20px 8px;font-size:.88rem;font-weight:700;color:var(--txt)}
+.bottom-sheet-options{padding:0 12px 20px}
+.bs-option{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);font-size:.82rem;color:var(--txt)}
+.bs-option:hover,.bs-option:active{background:var(--border2)}
+.bs-option.selected{background:rgba(99,102,241,.06);color:var(--primary);font-weight:700}
+.bs-option-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.bs-option-check{margin-left:auto;font-size:.8rem;color:var(--primary);opacity:0}
+.bs-option.selected .bs-option-check{opacity:1}
+.bs-option-label{flex:1}
+.bs-option-desc{font-size:.68rem;color:var(--txt3);font-weight:400;margin-top:2px}
+
+@media(max-width:768px){
+    .m-filter-trigger{display:flex}
+    .filter-chips{display:none!important}
+    .filter-left{flex-direction:row!important;gap:8px!important;flex-wrap:nowrap!important;align-items:center!important}
+    .filter-left .search-box{flex:1;min-width:0;width:auto!important}
+}
+</style>
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>등급 변동 이력</h1>
+            <a href="membership.html" style="font-size:.78rem;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-arrow-left"></i> 멤버십</a>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- KPI Summary -->
+        <div class="tier-overview">
+            <div class="tier-card" style="background:#fff;border:1px solid rgba(16,185,129,.2);box-shadow:var(--shadow)">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#059669,#10B981)"></div>
+                <div class="tier-card-icon" style="background:rgba(16,185,129,.15);color:#059669"><i class="fa-solid fa-arrow-up"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">18</div>
+                    <div class="tier-card-name">이번 달 승급</div>
+                </div>
+                <div class="tier-card-criteria">전월 대비 +5</div>
+            </div>
+            <div class="tier-card" style="background:#fff;border:1px solid rgba(239,68,68,.2);box-shadow:var(--shadow)">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#DC2626,#EF4444)"></div>
+                <div class="tier-card-icon" style="background:rgba(239,68,68,.15);color:#DC2626"><i class="fa-solid fa-arrow-down"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">3</div>
+                    <div class="tier-card-name">이번 달 강등</div>
+                </div>
+                <div class="tier-card-criteria">12개월 미활동 기준</div>
+            </div>
+            <div class="tier-card" style="background:#fff;border:1px solid rgba(59,130,246,.2);box-shadow:var(--shadow)">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#2563EB,#3B82F6)"></div>
+                <div class="tier-card-icon" style="background:rgba(59,130,246,.15);color:#2563EB"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">86%</div>
+                    <div class="tier-card-name">등급 유지율</div>
+                </div>
+                <div class="tier-card-criteria">전체 VIP 회원 기준</div>
+            </div>
+            <div class="tier-card" style="background:#fff;border:1px solid rgba(139,92,246,.2);box-shadow:var(--shadow)">
+                <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7C3AED,#8B5CF6)"></div>
+                <div class="tier-card-icon" style="background:rgba(139,92,246,.15);color:#7C3AED"><i class="fa-solid fa-gem"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">4</div>
+                    <div class="tier-card-name">신규 Diamond</div>
+                </div>
+                <div class="tier-card-criteria">이번 분기 달성</div>
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-bar">
+            <div class="filter-left">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="고객명 검색..." oninput="currentPage=1;renderHistory()">
+                </div>
+                <div class="filter-chips">
+                    <button class="chip active" onclick="setDir(this,'all')">전체</button>
+                    <button class="chip" onclick="setDir(this,'up')"><i class="fa-solid fa-arrow-up" style="color:var(--success)"></i> 승급</button>
+                    <button class="chip" onclick="setDir(this,'down')"><i class="fa-solid fa-arrow-down" style="color:var(--danger)"></i> 강등</button>
+                </div>
+                <button class="m-filter-trigger" onclick="openBottomSheet()">
+                    <i class="fa-solid fa-filter"></i>
+                    <span id="mFilterLabel">전체</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="filter-right">
+                <select class="hotel-select" id="monthFilter" onchange="currentPage=1;renderHistory()" style="width:140px">
+                    <option value="all">전체 기간</option>
+                    <option value="2026-05" selected>2026년 5월</option>
+                    <option value="2026-04">2026년 4월</option>
+                    <option value="2026-03">2026년 3월</option>
+                    <option value="2026-02">2026년 2월</option>
+                    <option value="2026-01">2026년 1월</option>
+                </select>
+                <button class="btn-outline"><i class="fa-solid fa-download"></i> 엑셀 다운</button>
+            </div>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="card desktop-only" style="margin-top:16px">
+            <div class="card-body" style="padding:0">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th>일자</th><th>고객</th><th>변동</th><th>이전 등급</th><th>변경 등급</th><th>사유</th><th>처리</th>
+                    </tr></thead>
+                    <tbody id="historyBody"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-cards mobile-only" id="historyMobile"></div>
+
+        <!-- Pagination -->
+        <div class="pagination" style="margin-top:16px">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span class="page-info">총 <b id="totalCount">0</b>건</span>
+                <select id="pageSizeSelect" onchange="changePageSize()" style="height:30px;border:1px solid var(--border);border-radius:4px;padding:0 6px;font-size:.75rem;font-family:var(--font);color:var(--txt2);background:#fff;cursor:pointer">
+                    <option value="10" selected>10개씩</option>
+                    <option value="15">15개씩</option>
+                    <option value="20">20개씩</option>
+                    <option value="30">30개씩</option>
+                </select>
+            </div>
+            <div class="page-btns" id="pageButtons"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Sheet -->
+<div class="bottom-sheet-overlay" id="bsOverlay" onclick="closeBottomSheet()"></div>
+<div class="bottom-sheet" id="bsPanel">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-title">변동 유형 선택</div>
+    <div class="bottom-sheet-options">
+        <button class="bs-option selected" onclick="selectFilter('all','전체')">
+            <div class="bs-option-icon" style="background:var(--border2);color:var(--txt2)"><i class="fa-solid fa-list"></i></div>
+            <div class="bs-option-label">전체<div class="bs-option-desc">승급 + 강등 모두 표시</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('up','승급')">
+            <div class="bs-option-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="fa-solid fa-arrow-up"></i></div>
+            <div class="bs-option-label">승급<div class="bs-option-desc">등급이 올라간 변동만</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('down','강등')">
+            <div class="bs-option-icon" style="background:rgba(239,68,68,.1);color:#DC2626"><i class="fa-solid fa-arrow-down"></i></div>
+            <div class="bs-option-label">강등<div class="bs-option-desc">등급이 내려간 변동만</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+const tierCfg = {
+    diamond:{label:'Diamond',icon:'fa-gem',color:'#60A5FA',bg:'rgba(96,165,250,.1)'},
+    platinum:{label:'Platinum',icon:'fa-star',color:'#A78BFA',bg:'rgba(167,139,250,.1)'},
+    gold:{label:'Gold',icon:'fa-crown',color:'#F59E0B',bg:'rgba(245,158,11,.1)'},
+    standard:{label:'Standard',icon:'fa-user',color:'#9CA3AF',bg:'rgba(156,163,175,.1)'}
+};
+
+const history = [
+    {date:'2026-05-13',name:'Kim Ji Yeon',init:'KJ',color:'#EC4899',dir:'up',from:'gold',to:'platinum',reason:'10회 투숙 달성 · 연 $5,800',by:'시스템 자동'},
+    {date:'2026-05-12',name:'Park Soo Jin',init:'PS',color:'#10B981',dir:'up',from:'standard',to:'gold',reason:'5회 투숙 달성 · 연 $2,970 적립',by:'시스템 자동'},
+    {date:'2026-05-11',name:'Robert Williams',init:'RW',color:'#3B82F6',dir:'up',from:'gold',to:'diamond',reason:'연 $12,400 돌파 · VIP 추천',by:'Nguyen Kim (Manager)'},
+    {date:'2026-05-10',name:'Nguyen Thi Lan',init:'NT',color:'#3B82F6',dir:'up',from:'standard',to:'gold',reason:'5회 투숙 달성',by:'시스템 자동'},
+    {date:'2026-05-08',name:'David Chen',init:'DC',color:'#3B82F6',dir:'up',from:'gold',to:'platinum',reason:'연 $5,000 돌파',by:'시스템 자동'},
+    {date:'2026-05-07',name:'Sofia Martinez',init:'SM',color:'#F59E0B',dir:'down',from:'platinum',to:'gold',reason:'12개월 미투숙 · 연 지출 미달',by:'시스템 자동'},
+    {date:'2026-05-05',name:'Garcia Miguel',init:'GM',color:'#EC4899',dir:'up',from:'platinum',to:'diamond',reason:'연 $10,000 돌파 · 18회 투숙',by:'시스템 자동'},
+    {date:'2026-05-03',name:'Lee Dong Hyun',init:'LD',color:'#10B981',dir:'up',from:'standard',to:'gold',reason:'VIP 수동 지정 · 기업 계약',by:'Admin'},
+    {date:'2026-05-02',name:'Wong Li',init:'WL',color:'#F59E0B',dir:'up',from:'standard',to:'gold',reason:'5회 투숙 달성',by:'시스템 자동'},
+    {date:'2026-05-01',name:'Yamamoto K.',init:'YK',color:'#8B5CF6',dir:'down',from:'gold',to:'standard',reason:'12개월 미투숙',by:'시스템 자동'},
+    {date:'2026-04-28',name:'Al Rashid Omar',init:'AR',color:'#F59E0B',dir:'up',from:'platinum',to:'diamond',reason:'20회 투숙 달성 · 연 $22,500',by:'시스템 자동'},
+    {date:'2026-04-25',name:'Lee Hana',init:'LH',color:'#8B5CF6',dir:'up',from:'gold',to:'platinum',reason:'10회 투숙 달성',by:'시스템 자동'},
+    {date:'2026-04-22',name:'Tanaka Yuki',init:'TY',color:'#10B981',dir:'up',from:'gold',to:'platinum',reason:'연 $5,000 돌파',by:'시스템 자동'},
+    {date:'2026-04-18',name:'Chen Wei',init:'CW',color:'#3B82F6',dir:'up',from:'standard',to:'gold',reason:'5회 투숙 달성',by:'시스템 자동'},
+    {date:'2026-04-15',name:'Nguyen Van B.',init:'NV',color:'#10B981',dir:'down',from:'platinum',to:'gold',reason:'12개월 미투숙 · 연 지출 미달',by:'시스템 자동'},
+    {date:'2026-04-10',name:'Kim Min Su',init:'KM',color:'#EC4899',dir:'up',from:'standard',to:'gold',reason:'VIP 수동 지정',by:'Nguyen Kim (Manager)'},
+    {date:'2026-03-28',name:'Sato Yuki',init:'SY',color:'#8B5CF6',dir:'up',from:'standard',to:'gold',reason:'5회 투숙 달성',by:'시스템 자동'},
+    {date:'2026-03-20',name:'Mueller Klaus',init:'MK',color:'#EC4899',dir:'down',from:'gold',to:'standard',reason:'12개월 미활동',by:'시스템 자동'},
+    {date:'2026-03-15',name:'Tran Linh',init:'TL',color:'#F59E0B',dir:'up',from:'gold',to:'diamond',reason:'연 $18,900 · 24회 투숙',by:'시스템 자동'},
+    {date:'2026-03-08',name:'John Smith',init:'JS',color:'#8B5CF6',dir:'up',from:'gold',to:'platinum',reason:'연 $6,240 돌파',by:'시스템 자동'},
+    {date:'2026-02-25',name:'Bui Tien',init:'BT',color:'#10B981',dir:'up',from:'standard',to:'gold',reason:'VIP 특별 승급',by:'Admin'},
+    {date:'2026-02-18',name:'Pham Anh',init:'PA',color:'#10B981',dir:'down',from:'gold',to:'standard',reason:'12개월 미활동 · 연 지출 $570',by:'시스템 자동'},
+    {date:'2026-01-30',name:'Kim Da Eun',init:'KD',color:'#3B82F6',dir:'up',from:'standard',to:'gold',reason:'5회 투숙 달성',by:'시스템 자동'},
+    {date:'2026-01-15',name:'Honda Kenji',init:'HK',color:'#8B5CF6',dir:'up',from:'gold',to:'platinum',reason:'10회 투숙 · 연 $7,200',by:'시스템 자동'},
+];
+
+let currentDir = 'all';
+let currentPage = 1;
+let pageSize = 10;
+
+function getFiltered() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const month = document.getElementById('monthFilter').value;
+    return history.filter(h => {
+        if (currentDir !== 'all' && h.dir !== currentDir) return false;
+        if (search && !h.name.toLowerCase().includes(search)) return false;
+        if (month !== 'all' && !h.date.startsWith(month)) return false;
+        return true;
+    });
+}
+
+function renderHistory() {
+    const filtered = getFiltered();
+    const total = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * pageSize;
+    const paged = filtered.slice(start, start + pageSize);
+
+    document.getElementById('totalCount').textContent = total;
+
+    // Desktop table
+    document.getElementById('historyBody').innerHTML = paged.map(h => {
+        const from = tierCfg[h.from], to = tierCfg[h.to];
+        const dirIcon = h.dir === 'up'
+            ? '<span style="color:var(--success);font-weight:700"><i class="fa-solid fa-arrow-up"></i> 승급</span>'
+            : '<span style="color:var(--danger);font-weight:700"><i class="fa-solid fa-arrow-down"></i> 강등</span>';
+        return `<tr>
+            <td style="white-space:nowrap;font-size:.78rem;color:var(--txt2)">${h.date}</td>
+            <td><div class="guest-cell"><div class="guest-avatar" style="background:${h.color}">${h.init}</div><strong>${h.name}</strong></div></td>
+            <td>${dirIcon}</td>
+            <td><span class="tier-badge" style="background:${from.bg};color:${from.color}"><i class="fa-solid ${from.icon}"></i> ${from.label}</span></td>
+            <td><span class="tier-badge" style="background:${to.bg};color:${to.color}"><i class="fa-solid ${to.icon}"></i> ${to.label}</span></td>
+            <td style="font-size:.78rem;color:var(--txt2);max-width:200px;white-space:normal">${h.reason}</td>
+            <td style="font-size:.72rem;color:var(--txt3)">${h.by}</td>
+        </tr>`;
+    }).join('');
+
+    // Mobile cards
+    document.getElementById('historyMobile').innerHTML = paged.map(h => {
+        const from = tierCfg[h.from], to = tierCfg[h.to];
+        const dirLabel = h.dir === 'up' ? '승급' : '강등';
+        const dirColor = h.dir === 'up' ? 'var(--success)' : 'var(--danger)';
+        return `<div class="m-res-card" style="border-left-color:${dirColor}">
+            <div class="m-res-top">
+                <div class="m-res-guest">
+                    <div class="guest-avatar" style="background:${h.color}">${h.init}</div>
+                    <div>
+                        <div class="m-res-name">${h.name}</div>
+                        <div class="m-res-sub">${h.date}</div>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <span style="font-size:.72rem;font-weight:700;color:${dirColor}"><i class="fa-solid fa-arrow-${h.dir === 'up' ? 'up' : 'down'}"></i> ${dirLabel}</span>
+                </div>
+            </div>
+            <div class="m-res-details">
+                <div class="m-res-detail">
+                    <span class="tier-badge" style="background:${from.bg};color:${from.color};font-size:.65rem"><i class="fa-solid ${from.icon}"></i> ${from.label}</span>
+                    <i class="fa-solid fa-arrow-right" style="color:var(--txt3);font-size:.6rem"></i>
+                    <span class="tier-badge" style="background:${to.bg};color:${to.color};font-size:.65rem"><i class="fa-solid ${to.icon}"></i> ${to.label}</span>
+                </div>
+                <div class="m-res-detail"><i class="fa-solid fa-clipboard-list"></i> ${h.reason}</div>
+                <div class="m-res-detail"><i class="fa-solid fa-user-check"></i> ${h.by}</div>
+            </div>
+        </div>`;
+    }).join('');
+
+    // Pagination buttons
+    let btns = `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="goPage(${currentPage-1})"><i class="fa-solid fa-chevron-left"></i></button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        btns += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+    }
+    btns += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="goPage(${currentPage+1})"><i class="fa-solid fa-chevron-right"></i></button>`;
+    document.getElementById('pageButtons').innerHTML = btns;
+}
+
+function goPage(p) { currentPage = p; renderHistory(); }
+function changePageSize() { pageSize = parseInt(document.getElementById('pageSizeSelect').value); currentPage = 1; renderHistory(); }
+
+function setDir(btn, dir) {
+    currentDir = dir;
+    currentPage = 1;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderHistory();
+}
+
+function toggleMenu() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.querySelector('.sidebar-overlay').classList.toggle('active');
+}
+
+// Bottom sheet
+function openBottomSheet() {
+    document.getElementById('bsOverlay').classList.add('active');
+    document.getElementById('bsPanel').classList.add('active');
+}
+function closeBottomSheet() {
+    document.getElementById('bsOverlay').classList.remove('active');
+    document.getElementById('bsPanel').classList.remove('active');
+}
+function selectFilter(dir, label) {
+    currentDir = dir;
+    currentPage = 1;
+    // Update bottom sheet selected state
+    document.querySelectorAll('.bs-option').forEach(o => o.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    // Update mobile trigger label
+    document.getElementById('mFilterLabel').textContent = label;
+    // Sync desktop chips
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    const chips = document.querySelectorAll('.chip');
+    if (dir === 'all') chips[0].classList.add('active');
+    else if (dir === 'up') chips[1].classList.add('active');
+    else chips[2].classList.add('active');
+    closeBottomSheet();
+    renderHistory();
+}
+
+renderHistory();
+
+// i18n
+let currentLang='ko';
+const translations={ko:{"등급 변동 이력":"등급 변동 이력","대시보드":"대시보드","예약 타임라인":"예약 타임라인","예약 목록":"예약 목록","체크인/아웃":"체크인/아웃","투숙객 관리":"투숙객 관리","VIP 멤버십":"VIP 멤버십","객실 관리":"객실 관리","하우스키핑":"하우스키핑","통합 정산":"통합 정산","부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리","이번 달 승급":"이번 달 승급","이번 달 강등":"이번 달 강등","등급 유지율":"등급 유지율","신규 Diamond":"신규 Diamond","전체":"전체","승급":"승급","강등":"강등"},en:{"등급 변동 이력":"Tier Change History","대시보드":"Dashboard","예약 타임라인":"Reservations","예약 목록":"Booking List","체크인/아웃":"Check-in/out","투숙객 관리":"Guest CRM","VIP 멤버십":"VIP Members","객실 관리":"Room Mgmt","하우스키핑":"Housekeeping","통합 정산":"Folio & Billing","부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt","이번 달 승급":"Upgrades (Month)","이번 달 강등":"Downgrades (Month)","등급 유지율":"Retention Rate","신규 Diamond":"New Diamond","전체":"All","승급":"Upgrade","강등":"Downgrade"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){currentLang=l;const d=translations[l]||translations.ko;document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]});document.getElementById('searchInput').placeholder=l==='en'?'Search guest name...':'고객명 검색...';renderHistory();}
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+
+</body>
+</html>

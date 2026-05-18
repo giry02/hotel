@@ -1,0 +1,359 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP 멤버십 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/crm.css">
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>VIP 멤버십</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- TIER OVERVIEW -->
+        <div class="section-header">
+            <h3 style="margin:0;color:var(--txt)">등급별 회원 현황 및 기준</h3>
+            <button class="btn-outline" onclick="openModal('vipCriteriaModal')"><i class="fa-solid fa-sliders"></i> 승급 기준 관리</button>
+        </div>
+        <div class="tier-overview">
+            <div class="tier-card diamond">
+                <div class="tier-card-icon"><i class="fa-solid fa-gem"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">40</div>
+                    <div class="tier-card-name">Diamond</div>
+                </div>
+                <div class="tier-card-criteria">20회 이상 투숙 · 연 $10,000+</div>
+            </div>
+            <div class="tier-card platinum">
+                <div class="tier-card-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">52</div>
+                    <div class="tier-card-name">Platinum</div>
+                </div>
+                <div class="tier-card-criteria">10회 이상 투숙 · 연 $5,000+</div>
+            </div>
+            <div class="tier-card gold">
+                <div class="tier-card-icon"><i class="fa-solid fa-crown"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">94</div>
+                    <div class="tier-card-name">Gold</div>
+                </div>
+                <div class="tier-card-criteria">5회 이상 투숙 · 연 $2,000+</div>
+            </div>
+            <div class="tier-card standard">
+                <div class="tier-card-icon"><i class="fa-solid fa-user"></i></div>
+                <div class="tier-card-info">
+                    <div class="tier-card-count">2,661</div>
+                    <div class="tier-card-name">Standard</div>
+                </div>
+                <div class="tier-card-criteria">일반 회원 · 가입 즉시</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top:20px">
+            <div class="card-header collapsible collapsed" onclick="toggleBenefits()">
+                <div class="card-title"><i class="fa-solid fa-gift"></i> 등급별 혜택</div>
+                <i class="fa-solid fa-chevron-down collapse-icon" id="benefitsChevron"></i>
+            </div>
+            <div class="card-collapse collapsed" id="benefitsBody">
+            <div class="card-body" style="padding:0">
+                <!-- Desktop table -->
+                <div class="table-wrap benefits-table-wrap">
+                    <table class="benefits-table">
+                        <thead><tr>
+                            <th>혜택</th>
+                            <th class="tc"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard</th>
+                            <th class="tc"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold</th>
+                            <th class="tc"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum</th>
+                            <th class="tc"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr><td>객실 할인</td><td class="tc">—</td><td class="tc">5%</td><td class="tc">10%</td><td class="tc">15%</td></tr>
+                            <tr><td>얼리 체크인</td><td class="tc">—</td><td class="tc">—</td><td class="tc"><i class="fa-solid fa-check c-green"></i></td><td class="tc"><i class="fa-solid fa-check c-green"></i></td></tr>
+                            <tr><td>레이트 체크아웃</td><td class="tc">—</td><td class="tc"><i class="fa-solid fa-check c-green"></i></td><td class="tc"><i class="fa-solid fa-check c-green"></i></td><td class="tc"><i class="fa-solid fa-check c-green"></i></td></tr>
+                            <tr><td>무료 조식</td><td class="tc">—</td><td class="tc">—</td><td class="tc"><i class="fa-solid fa-check c-green"></i></td><td class="tc"><i class="fa-solid fa-check c-green"></i></td></tr>
+                            <tr><td>객실 업그레이드</td><td class="tc">—</td><td class="tc">—</td><td class="tc">가능 시</td><td class="tc"><i class="fa-solid fa-check c-green"></i> 우선</td></tr>
+                            <tr><td>라운지 이용</td><td class="tc">—</td><td class="tc">—</td><td class="tc">—</td><td class="tc"><i class="fa-solid fa-check c-green"></i></td></tr>
+                            <tr><td>공항 픽업</td><td class="tc">—</td><td class="tc">—</td><td class="tc">—</td><td class="tc"><i class="fa-solid fa-check c-green"></i></td></tr>
+                            <tr><td>환영 어메니티</td><td class="tc">—</td><td class="tc">과일</td><td class="tc">과일+와인</td><td class="tc">풀 패키지</td></tr>
+                            <tr><td>포인트 적립률</td><td class="tc">1x</td><td class="tc">1.5x</td><td class="tc">2x</td><td class="tc">3x</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Mobile benefit cards -->
+                <div class="mobile-benefits">
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">객실 할인</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value">5%</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value">10%</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value">15%</span></div>
+                        </div>
+                    </div>
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">얼리 체크인</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                        </div>
+                    </div>
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">레이트 체크아웃</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                        </div>
+                    </div>
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">무료 조식</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                        </div>
+                    </div>
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">객실 업그레이드</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value">가능 시</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i> 우선</span></div>
+                        </div>
+                    </div>
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">라운지 이용 / 공항 픽업</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value" style="color:var(--success)"><i class="fa-solid fa-check"></i></span></div>
+                        </div>
+                    </div>
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">환영 어메니티</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">—</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value">과일</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value">과일+와인</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value">풀 패키지</span></div>
+                        </div>
+                    </div>
+                    <div class="m-benefit-card">
+                        <div class="m-benefit-name">포인트 적립률</div>
+                        <div class="m-benefit-tiers">
+                            <div class="m-benefit-tier"><i class="fa-solid fa-user" style="color:#9CA3AF"></i> Standard: <span class="m-tier-value">1x</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold: <span class="m-tier-value">1.5x</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum: <span class="m-tier-value">2x</span></div>
+                            <div class="m-benefit-tier"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond: <span class="m-tier-value">3x</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div><!-- /card-collapse -->
+        </div>
+
+        <!-- RECENT TIER CHANGES -->
+        <div class="card" style="margin-top:20px">
+            <div class="card-header">
+                <div class="card-title"><i class="fa-solid fa-arrow-up-right-dots"></i> 최근 등급 변동</div>
+                <a href="tier-history.html" class="view-all-btn"><i class="fa-solid fa-arrow-right"></i> 더보기</a>
+            </div>
+            <div class="card-body">
+                <div class="tier-changes">
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Park Soo Jin</div>
+                            <div class="tc-detail">Standard → <strong style="color:#F59E0B">Gold</strong> · 5회 투숙 달성</div>
+                        </div>
+                        <div class="tc-date">5/12</div>
+                    </div>
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Nguyen Thi Lan</div>
+                            <div class="tc-detail">Standard → <strong style="color:#F59E0B">Gold</strong> · 5회 투숙 달성</div>
+                        </div>
+                        <div class="tc-date">5/10</div>
+                    </div>
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">David Chen</div>
+                            <div class="tc-detail">Gold → <strong style="color:#A78BFA">Platinum</strong> · 연 $5,000 돌파</div>
+                        </div>
+                        <div class="tc-date">5/08</div>
+                    </div>
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Garcia Miguel</div>
+                            <div class="tc-detail">Platinum → <strong style="color:#60A5FA">Diamond</strong> · 연 $10,000 돌파</div>
+                        </div>
+                        <div class="tc-date">5/05</div>
+                    </div>
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Wong Li</div>
+                            <div class="tc-detail">Standard → <strong style="color:#F59E0B">Gold</strong> · 5회 투숙 달성</div>
+                        </div>
+                        <div class="tc-date">5/02</div>
+                    </div>
+                    <div class="tc-item downgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Yamamoto K.</div>
+                            <div class="tc-detail">Gold → <strong style="color:#9CA3AF">Standard</strong> · 12개월 미투숙</div>
+                        </div>
+                        <div class="tc-date">5/01</div>
+                    </div>
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Al Rashid Omar</div>
+                            <div class="tc-detail">Platinum → <strong style="color:#60A5FA">Diamond</strong> · 20회 투숙 달성</div>
+                        </div>
+                        <div class="tc-date">4/28</div>
+                    </div>
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Lee Hana</div>
+                            <div class="tc-detail">Gold → <strong style="color:#A78BFA">Platinum</strong> · 10회 투숙 달성</div>
+                        </div>
+                        <div class="tc-date">4/25</div>
+                    </div>
+                    <div class="tc-item upgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-up"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Tanaka Yuki</div>
+                            <div class="tc-detail">Gold → <strong style="color:#A78BFA">Platinum</strong> · 연 $5,000 돌파</div>
+                        </div>
+                        <div class="tc-date">4/22</div>
+                    </div>
+                    <div class="tc-item downgrade">
+                        <div class="tc-icon"><i class="fa-solid fa-arrow-down"></i></div>
+                        <div class="tc-info">
+                            <div class="tc-name">Nguyen Van B.</div>
+                            <div class="tc-detail">Platinum → <strong style="color:#F59E0B">Gold</strong> · 연 지출 미달</div>
+                        </div>
+                        <div class="tc-date">4/15</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+function toggleBenefits() {
+    const body = document.getElementById('benefitsBody');
+    const header = body.previousElementSibling;
+    const icon = document.getElementById('benefitsChevron');
+    const isCollapsed = body.classList.toggle('collapsed');
+    header.classList.toggle('collapsed');
+    icon.className = isCollapsed ? 'fa-solid fa-chevron-down collapse-icon' : 'fa-solid fa-chevron-up collapse-icon';
+}
+
+// i18n
+let currentLang='ko';
+const translations={ko:{"VIP 멤버십":"VIP 멤버십","대시보드":"대시보드","예약 타임라인":"예약 타임라인","예약 목록":"예약 목록","체크인/아웃":"체크인/아웃","투숙객 관리":"투숙객 관리","객실 관리":"객실 관리","하우스키핑":"하우스키핑","통합 정산":"통합 정산","부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리","등급별 혜택":"등급별 혜택","최근 등급 변동":"최근 등급 변동","이번 달":"이번 달","지난 달":"지난 달","혜택":"혜택","객실 할인":"객실 할인","얼리 체크인":"얼리 체크인","레이트 체크아웃":"레이트 체크아웃","무료 조식":"무료 조식","객실 업그레이드":"객실 업그레이드","라운지 이용":"라운지 이용","공항 픽업":"공항 픽업","환영 어메니티":"환영 어메니티","포인트 적립률":"포인트 적립률"},en:{"VIP 멤버십":"VIP Membership","대시보드":"Dashboard","예약 타임라인":"Reservations","예약 목록":"Booking List","체크인/아웃":"Check-in/out","투숙객 관리":"Guest CRM","객실 관리":"Room Mgmt","하우스키핑":"Housekeeping","통합 정산":"Folio & Billing","부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt","등급별 혜택":"Tier Benefits","최근 등급 변동":"Recent Tier Changes","이번 달":"This Month","지난 달":"Last Month","혜택":"Benefit","객실 할인":"Room Discount","얼리 체크인":"Early Check-in","레이트 체크아웃":"Late Check-out","무료 조식":"Free Breakfast","객실 업그레이드":"Room Upgrade","라운지 이용":"Lounge Access","공항 픽업":"Airport Pickup","환영 어메니티":"Welcome Amenity","포인트 적립률":"Point Earn Rate"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){currentLang=l;const d=translations[l]||translations.ko;document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]})}
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+
+<!-- VIP Criteria Management Modal -->
+<div class="modal-overlay" id="vipCriteriaModal" onclick="if(event.target===this) closeModal('vipCriteriaModal')">
+    <div class="modal-card" style="max-width:500px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">VIP 승급 기준 관리</h3>
+            <button class="modal-close" onclick="closeModal('vipCriteriaModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <p style="font-size:0.85rem;color:var(--txt2)">고객이 다음 등급으로 자동 승급되기 위한 최소 누적 투숙 횟수와 결제 금액 기준을 설정합니다.</p>
+            
+            <div style="border:1px solid var(--border);border-radius:4px;padding:16px">
+                <div style="font-weight:700;color:#F59E0B;margin-bottom:12px"><i class="fa-solid fa-crown"></i> Gold 승급 기준</div>
+                <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--txt2)">최소 투숙 횟수 (회)</label>
+                        <input type="number" style="width:100%;height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px" value="5">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--txt2)">최소 연 결제액 ($)</label>
+                        <input type="number" style="width:100%;height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px" value="2000">
+                    </div>
+                </div>
+            </div>
+
+            <div style="border:1px solid var(--border);border-radius:4px;padding:16px">
+                <div style="font-weight:700;color:#A78BFA;margin-bottom:12px"><i class="fa-solid fa-star"></i> Platinum 승급 기준</div>
+                <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--txt2)">최소 투숙 횟수 (회)</label>
+                        <input type="number" style="width:100%;height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px" value="10">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--txt2)">최소 연 결제액 ($)</label>
+                        <input type="number" style="width:100%;height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px" value="5000">
+                    </div>
+                </div>
+            </div>
+
+            <div style="border:1px solid var(--border);border-radius:4px;padding:16px">
+                <div style="font-weight:700;color:#60A5FA;margin-bottom:12px"><i class="fa-solid fa-gem"></i> Diamond 승급 기준</div>
+                <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--txt2)">최소 투숙 횟수 (회)</label>
+                        <input type="number" style="width:100%;height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px" value="20">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem;color:var(--txt2)">최소 연 결제액 ($)</label>
+                        <input type="number" style="width:100%;height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px" value="10000">
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('vipCriteriaModal')">취소</button>
+            <button class="btn-primary-sm" onclick="alert('승급 기준이 업데이트 되었습니다.');closeModal('vipCriteriaModal')"><i class="fa-solid fa-check"></i> 저장</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

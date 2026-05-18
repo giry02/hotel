@@ -1,0 +1,117 @@
+/* ===== CRM & MEMBERSHIP STYLES ===== */
+
+/* ===== TIER BADGE ===== */
+.tier-badge{padding:4px 10px;border-radius:12px;font-size:.72rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+
+/* ===== TIER OVERVIEW CARDS ===== */
+.tier-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:8px}
+.tier-card{border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;transition:all .3s;cursor:default}
+.tier-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.tier-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+
+.tier-card.diamond{background:#fff;border:1px solid rgba(96,165,250,.2);box-shadow:var(--shadow)}
+.tier-card.diamond::after{background:linear-gradient(90deg,#3B82F6,#60A5FA)}
+.tier-card.platinum{background:#fff;border:1px solid rgba(167,139,250,.2);box-shadow:var(--shadow)}
+.tier-card.platinum::after{background:linear-gradient(90deg,#8B5CF6,#A78BFA)}
+.tier-card.gold{background:#fff;border:1px solid rgba(245,158,11,.2);box-shadow:var(--shadow)}
+.tier-card.gold::after{background:linear-gradient(90deg,#D97706,#F59E0B)}
+.tier-card.standard{background:#fff;border:1px solid rgba(156,163,175,.2);box-shadow:var(--shadow)}
+.tier-card.standard::after{background:linear-gradient(90deg,#6B7280,#9CA3AF)}
+
+.tier-card-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.tier-card.diamond .tier-card-icon{background:rgba(96,165,250,.15);color:#3B82F6}
+.tier-card.platinum .tier-card-icon{background:rgba(167,139,250,.15);color:#8B5CF6}
+.tier-card.gold .tier-card-icon{background:rgba(245,158,11,.15);color:#D97706}
+.tier-card.standard .tier-card-icon{background:rgba(156,163,175,.15);color:#6B7280}
+
+.tier-card-info{flex:1}
+.tier-card-count{font-size:1.5rem;font-weight:800;color:var(--txt);line-height:1.1}
+.tier-card-name{font-size:.82rem;font-weight:600;color:var(--txt2);margin-top:2px}
+.tier-card-criteria{font-size:.68rem;color:var(--txt3);line-height:1.5;text-align:right;flex-shrink:0}
+
+/* ===== BENEFITS TABLE ===== */
+.benefits-table th,.benefits-table td{text-align:left;white-space:nowrap}
+.benefits-table .tc{text-align:center}
+.c-green{color:var(--success)}
+
+/* ===== CARD HEADER ===== */
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border2)}
+.card-title{font-size:.92rem;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px}
+.card-title i{color:var(--primary);font-size:.85rem}
+.card-actions{display:flex;gap:4px}
+.card-actions button{padding:5px 12px;border:1px solid var(--border);background:var(--card);border-radius:var(--radius-sm);font-size:.72rem;font-weight:600;color:var(--txt2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.card-actions button:hover,.card-actions button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+/* ===== COLLAPSIBLE CARD ===== */
+.card-header.collapsible{cursor:pointer;user-select:none;transition:background .15s;flex-direction:row!important;align-items:center!important}
+.card-header.collapsible:hover{background:var(--border2)}
+.collapse-icon{font-size:.75rem;color:var(--txt3);margin-left:auto;flex-shrink:0;transition:color .2s}
+.card-header.collapsible:hover .collapse-icon{color:var(--txt2)}
+.card-collapse{max-height:2000px;overflow:hidden;transition:max-height .4s ease}
+.card-collapse.collapsed{max-height:0}
+
+/* ===== TIER CHANGES LIST ===== */
+.tier-changes{display:flex;flex-direction:column;gap:10px}
+.tc-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:var(--radius-sm);background:var(--border2);transition:all .2s}
+.tc-item:hover{background:rgba(59,130,246,.04)}
+.tc-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0}
+.tc-item.upgrade .tc-icon{background:var(--success-lt);color:var(--success)}
+.tc-item.downgrade .tc-icon{background:var(--danger-lt);color:var(--danger)}
+.tc-info{flex:1;min-width:0}
+.tc-name{font-size:.85rem;font-weight:700;color:var(--txt)}
+.tc-detail{font-size:.75rem;color:var(--txt2);margin-top:2px}
+.tc-date{font-size:.72rem;color:var(--txt3);font-weight:600;flex-shrink:0}
+
+/* ===== MOBILE BENEFITS CARDS (replaces table on mobile) ===== */
+.mobile-benefits{display:none;flex-direction:column;gap:12px;padding:16px}
+.m-benefit-card{background:var(--border2);border-radius:var(--radius-sm);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.m-benefit-name{font-size:.85rem;font-weight:700;color:var(--txt);padding-bottom:8px;border-bottom:1px solid var(--border)}
+.m-benefit-tiers{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m-benefit-tier{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--txt2)}
+.m-benefit-tier i{font-size:.65rem}
+.m-benefit-tier .m-tier-value{font-weight:700;color:var(--txt)}
+
+/* ===== SECTION HEADER MOBILE ===== */
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px}
+.section-header h3{margin:0;color:var(--txt)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1024px){
+    .tier-overview{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:768px){
+    .tier-overview{grid-template-columns:1fr 1fr;gap:10px}
+    .tier-card{padding:14px;gap:12px}
+    .tier-card-icon{width:40px;height:40px;font-size:.92rem;border-radius:10px}
+    .tier-card-count{font-size:1.2rem}
+    .tier-card-criteria{display:none}
+    .tc-item{flex-wrap:wrap;padding:10px 12px;gap:10px}
+    .tc-date{width:100%;text-align:right;border-top:1px solid var(--border2);padding-top:6px;margin-top:-2px}
+
+    /* Benefits: hide table, show cards */
+    .benefits-table-wrap{display:none!important}
+    .mobile-benefits{display:flex!important}
+
+    /* Section header stacking */
+    .section-header{flex-direction:column;align-items:flex-start;gap:8px}
+    .section-header .btn-outline{width:100%;justify-content:center}
+
+    /* Guest modal 2-col → 1-col */
+    .modal-form-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:480px){
+    .tier-overview{grid-template-columns:1fr 1fr;gap:8px}
+    .tier-card{padding:12px 10px;gap:8px}
+    .tier-card-icon{width:34px;height:34px;font-size:.8rem;border-radius:8px}
+    .tier-card-count{font-size:1.05rem}
+    .tier-card-name{font-size:.72rem}
+
+    /* Tier changes compact */
+    .tc-item{padding:8px 10px;gap:8px}
+    .tc-icon{width:30px;height:30px;font-size:.7rem;border-radius:8px}
+    .tc-name{font-size:.8rem}
+    .tc-detail{font-size:.7rem}
+
+    /* Benefits card 1-col */
+    .m-benefit-tiers{grid-template-columns:1fr}
+}

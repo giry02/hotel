@@ -3,121 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>호텔 예약 디자인 프로토타입 인덱스</title>
+    <title>Hotel PMS</title>
     <style>
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #F5F6F8;
-            color: #111;
-            padding: 40px 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            text-align: center;
-            color: #1D4ED8;
-        }
-        .section {
-            background: #FFFFFF;
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            border-bottom: 2px solid #ECEDF0;
-            padding-bottom: 10px;
-        }
-        .link-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        a {
+            margin: 0;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 14px 20px;
-            background: #F8F9FA;
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #333;
-            font-weight: 600;
-            transition: all 0.2s;
+            justify-content: center;
+            min-height: 100vh;
+            background: #0f172a;
+            font-family: 'Inter', sans-serif;
         }
-        a:hover {
-            background: #EFF6FF;
-            border-color: #1D4ED8;
-            color: #1D4ED8;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(29,78,216,0.1);
+        .splash {
+            text-align: center;
+            color: #fff;
         }
-        .badge {
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 20px;
-            background: #E5E7EB;
-            color: #555;
+        .splash-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 32px rgba(59,130,246,.4);
         }
-        .badge.dark { background: #1D1D1D; color: #FFF; }
-        .badge.blue { background: #1D4ED8; color: #FFF; }
-        .badge.light { background: #F2114C; color: #FFF; }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
+        .splash h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 0 0 8px;
         }
-        @media(max-width: 600px) {
-            .grid { grid-template-columns: 1fr; }
+        .splash p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin: 0 0 24px;
         }
+        .spinner {
+            width: 28px;
+            height: 28px;
+            border: 3px solid rgba(255,255,255,.15);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-
-    <h1>🏨 호텔 예약 프로토타입</h1>
-
-    <div class="section">
-        <div class="section-title">메인 페이지 (Main)</div>
-        <div class="grid">
-            <a href="main/dark.html"><span>메인_dark</span> <span class="badge dark">Dark</span></a>
-            <a href="main/blue.html"><span>메인_blue</span> <span class="badge blue">Blue</span></a>
-            <a href="main/light.html"><span>메인_light</span> <span class="badge light">Light</span></a>
-        </div>
+    <div class="splash">
+        <div class="splash-logo">H</div>
+        <h1>HOTEL PMS</h1>
+        <p>Loading...</p>
+        <div class="spinner"></div>
     </div>
 
-    <div class="section">
-        <div class="section-title">Type A (Immersive) 서브 페이지</div>
-        <div class="grid">
-            <a href="typeA/dark.html"><span>A서브_dark</span> <span class="badge dark">Dark</span></a>
-            <a href="typeA/blue.html"><span>A서브_blue</span> <span class="badge blue">Blue</span></a>
-            <a href="typeA/light.html"><span>A서브_light</span> <span class="badge light">Light</span></a>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Type B (Card-based) 서브 페이지</div>
-        <div class="grid">
-            <a href="typeB/dark.html"><span>B서브_dark</span> <span class="badge dark">Dark</span></a>
-            <a href="typeB/blue.html"><span>B서브_blue</span> <span class="badge blue">Blue</span></a>
-            <a href="typeB/light.html"><span>B서브_light</span> <span class="badge light">Light</span></a>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Type C (Tabbed) 서브 페이지</div>
-        <div class="grid">
-            <a href="typeC/dark.html"><span>C서브_dark</span> <span class="badge dark">Dark</span></a>
-            <a href="typeC/blue.html"><span>C서브_blue</span> <span class="badge blue">Blue</span></a>
-            <a href="typeC/light.html"><span>C서브_light</span> <span class="badge light">Light</span></a>
-        </div>
-    </div>
-
+    <script>
+        // 로그인 상태 확인 후 분기
+        // sessionStorage에 'pms_logged_in' = 'true' 가 있으면 대시보드로, 아니면 로그인으로
+        (function() {
+            const isLoggedIn = sessionStorage.getItem('pms_logged_in') === 'true';
+            if (isLoggedIn) {
+                window.location.replace('dashboard.html');
+            } else {
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
 </body>
 </html>

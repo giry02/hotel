@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 목록 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+<style>
+.m-filter-trigger{display:none;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:.75rem;font-weight:600;color:var(--txt);cursor:pointer;font-family:var(--font);align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.m-filter-trigger i{font-size:.65rem;color:var(--txt3)}
+.bottom-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}
+.bottom-sheet-overlay.active{opacity:1;pointer-events:auto}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#fff;border-radius:16px 16px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:70vh;box-shadow:0 -4px 30px rgba(0,0,0,.15)}
+.bottom-sheet.active{transform:translateY(0)}
+.bottom-sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 0}
+.bottom-sheet-title{padding:16px 20px 8px;font-size:.88rem;font-weight:700;color:var(--txt)}
+.bottom-sheet-options{padding:0 12px 20px}
+.bs-option{display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);font-size:.82rem;color:var(--txt)}
+.bs-option:hover,.bs-option:active{background:var(--border2)}
+.bs-option.selected{background:rgba(99,102,241,.06);color:var(--primary);font-weight:700}
+.bs-option-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.bs-option-check{margin-left:auto;font-size:.8rem;color:var(--primary);opacity:0}
+.bs-option.selected .bs-option-check{opacity:1}
+.bs-option-count{font-size:.7rem;background:var(--border2);border-radius:10px;padding:2px 8px;color:var(--txt2);font-weight:600}
+.bs-option.selected .bs-option-count{background:rgba(99,102,241,.12);color:var(--primary)}
+@media(max-width:768px){
+    .m-filter-trigger{display:flex}
+    .filter-chips{display:none!important}
+    .filter-left{flex-direction:row!important;gap:8px!important;flex-wrap:nowrap!important;align-items:center!important}
+    .filter-left .search-box{flex:1;min-width:0;width:auto!important}
+}
+</style>
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<!-- MOBILE OVERLAY -->
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>예약 목록</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <select class="hotel-select">
+                <option>🏨 The Grand Saigon</option>
+                <option>🏨 Azure Bangkok</option>
+                <option>🏨 Pearl Phnom Penh</option>
+            </select>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="margin-left:8px; width:110px">
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- FILTER & SEARCH BAR -->
+        <div class="filter-bar">
+            <div class="filter-left">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="이름, 객실번호, 예약번호 검색..." oninput="filterTable()">
+                </div>
+                <div class="filter-chips">
+                    <button class="chip active" data-filter="all" onclick="setFilter(this,'all')">전체 <span class="chip-count">24</span></button>
+                    <button class="chip" data-filter="confirmed" onclick="setFilter(this,'confirmed')">확정 <span class="chip-count">14</span></button>
+                    <button class="chip" data-filter="pending" onclick="setFilter(this,'pending')">대기 <span class="chip-count">4</span></button>
+                    <button class="chip" data-filter="checkedin" onclick="setFilter(this,'checkedin')">체크인 <span class="chip-count">3</span></button>
+                    <button class="chip" data-filter="checkout" onclick="setFilter(this,'checkout')">체크아웃 <span class="chip-count">2</span></button>
+                    <button class="chip" data-filter="cancelled" onclick="setFilter(this,'cancelled')">취소 <span class="chip-count">1</span></button>
+                </div>
+                <button class="m-filter-trigger" onclick="openResBS()">
+                    <i class="fa-solid fa-filter"></i>
+                    <span id="mResFilterLabel">전체</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="filter-right">
+                <button class="btn-outline"><i class="fa-solid fa-download"></i> 엑셀 다운</button>
+                <button class="btn-primary-sm" onclick="openModal('newResModal')"><i class="fa-solid fa-plus"></i> 신규 예약</button>
+            </div>
+        </div>
+
+        <!-- RESERVATION TABLE (desktop) -->
+        <div class="card desktop-only" style="margin-top:16px">
+            <div class="card-body" style="padding:0">
+                <div class="table-wrap">
+                    <table id="resTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="checkAll" onclick="toggleAll()"></th>
+                                <th>예약번호</th>
+                                <th>투숙객</th>
+                                <th>객실</th>
+                                <th>유형</th>
+                                <th>체크인</th>
+                                <th>체크아웃</th>
+                                <th>숙박</th>
+                                <th>채널</th>
+                                <th>금액(USD)</th>
+                                <th>상태</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resBody">
+                            <!-- Generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESERVATION CARDS (mobile) -->
+        <div class="mobile-cards mobile-only" id="resMobileCards">
+            <!-- Generated by JS -->
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="pagination">
+            <span class="page-info">총 <b>24건</b> 중 1–24 표시</span>
+            <div class="page-btns">
+                <button class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Sheet -->
+<div class="bottom-sheet-overlay" id="resBsOverlay" onclick="closeResBS()"></div>
+<div class="bottom-sheet" id="resBsPanel">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-title">예약 상태 필터</div>
+    <div class="bottom-sheet-options">
+        <button class="bs-option selected" onclick="selectResFilter(this,'all','전체')">
+            <div class="bs-option-icon" style="background:var(--border2);color:var(--txt2)"><i class="fa-solid fa-list"></i></div>
+            전체
+            <span class="bs-option-count">24</span>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectResFilter(this,'confirmed','확정')">
+            <div class="bs-option-icon" style="background:rgba(16,185,129,.1);color:#059669"><i class="fa-solid fa-circle-check"></i></div>
+            확정
+            <span class="bs-option-count">14</span>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectResFilter(this,'pending','대기')">
+            <div class="bs-option-icon" style="background:rgba(245,158,11,.1);color:#D97706"><i class="fa-solid fa-clock"></i></div>
+            대기
+            <span class="bs-option-count">4</span>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectResFilter(this,'checkedin','체크인')">
+            <div class="bs-option-icon" style="background:rgba(59,130,246,.1);color:#2563EB"><i class="fa-solid fa-right-to-bracket"></i></div>
+            체크인
+            <span class="bs-option-count">3</span>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectResFilter(this,'checkout','체크아웃')">
+            <div class="bs-option-icon" style="background:rgba(139,92,246,.1);color:#7C3AED"><i class="fa-solid fa-right-from-bracket"></i></div>
+            체크아웃
+            <span class="bs-option-count">2</span>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectResFilter(this,'cancelled','취소')">
+            <div class="bs-option-icon" style="background:rgba(239,68,68,.1);color:#DC2626"><i class="fa-solid fa-ban"></i></div>
+            취소
+            <span class="bs-option-count">1</span>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+// ===== RESERVATION DATA =====
+const reservations = [
+    {id:'RSV-20260512-001',guest:'Nguyen Thi',initials:'NT',color:'#3B82F6',vip:'VIP Gold',room:'1205',type:'Deluxe',cin:'5/12',cout:'5/15',nights:3,channel:'Direct',amount:373.50,status:'confirmed'},
+    {id:'RSV-20260512-002',guest:'John Smith',initials:'JS',color:'#8B5CF6',vip:'Silver',room:'0807',type:'Suite',cin:'5/12',cout:'5/14',nights:2,channel:'Agoda',amount:520.00,status:'checkedin'},
+    {id:'RSV-20260512-003',guest:'Park Kyung',initials:'PK',color:'#10B981',vip:'Standard',room:'0503',type:'Standard',cin:'5/12',cout:'5/13',nights:1,channel:'Direct',amount:95.00,status:'confirmed'},
+    {id:'RSV-20260512-004',guest:'Tran Linh',initials:'TL',color:'#F59E0B',vip:'VIP',room:'PH01',type:'Penthouse',cin:'5/12',cout:'5/16',nights:4,channel:'Direct',amount:2400.00,status:'confirmed'},
+    {id:'RSV-20260512-005',guest:'Kim Da',initials:'KD',color:'#EC4899',vip:'Gold',room:'0501',type:'Standard',cin:'5/12',cout:'5/17',nights:5,channel:'Booking',amount:475.00,status:'checkedin'},
+    {id:'RSV-20260512-006',guest:'Lee Min',initials:'LM',color:'#3B82F6',vip:'Standard',room:'0302',type:'Standard',cin:'5/13',cout:'5/17',nights:4,channel:'Agoda',amount:360.00,status:'confirmed'},
+    {id:'RSV-20260512-007',guest:'Chen Wei',initials:'CW',color:'#10B981',vip:'Standard',room:'0701',type:'Deluxe',cin:'5/13',cout:'5/19',nights:6,channel:'Agoda',amount:780.00,status:'confirmed'},
+    {id:'RSV-20260512-008',guest:'Nguyen Ha',initials:'NH',color:'#F59E0B',vip:'Standard',room:'0702',type:'Deluxe',cin:'5/12',cout:'5/15',nights:3,channel:'Direct',amount:390.00,status:'checkedin'},
+    {id:'RSV-20260512-009',guest:'Park Soo',initials:'PS',color:'#8B5CF6',vip:'Standard',room:'0301',type:'Standard',cin:'5/12',cout:'5/15',nights:3,channel:'Direct',amount:270.00,status:'confirmed'},
+    {id:'RSV-20260512-010',guest:'Tran Van',initials:'TV',color:'#EF4444',vip:'Standard',room:'0303',type:'Standard',cin:'5/14',cout:'5/16',nights:2,channel:'Walk-in',amount:180.00,status:'pending'},
+    {id:'RSV-20260512-011',guest:'Pham Anh',initials:'PA',color:'#3B82F6',vip:'Standard',room:'0502',type:'Standard',cin:'5/15',cout:'5/18',nights:3,channel:'Direct',amount:285.00,status:'confirmed'},
+    {id:'RSV-20260512-012',guest:'Tanaka Y.',initials:'TY',color:'#10B981',vip:'Standard',room:'0703',type:'Deluxe',cin:'5/16',cout:'5/20',nights:4,channel:'Booking',amount:520.00,status:'confirmed'},
+    {id:'RSV-20260512-013',guest:'Smith J.',initials:'SJ',color:'#F59E0B',vip:'Standard',room:'0801',type:'Deluxe',cin:'5/12',cout:'5/14',nights:2,channel:'Direct',amount:260.00,status:'checkout'},
+    {id:'RSV-20260512-014',guest:'Wong Li',initials:'WL',color:'#8B5CF6',vip:'Standard',room:'0807',type:'Suite',cin:'5/14',cout:'5/19',nights:5,channel:'Agoda',amount:1300.00,status:'confirmed'},
+    {id:'RSV-20260512-015',guest:'Garcia M.',initials:'GM',color:'#EC4899',vip:'VIP',room:'1001',type:'Suite',cin:'5/12',cout:'5/19',nights:7,channel:'Direct',amount:2100.00,status:'confirmed'},
+    {id:'RSV-20260512-016',guest:'Mueller K.',initials:'MK',color:'#3B82F6',vip:'Standard',room:'1002',type:'Suite',cin:'5/13',cout:'5/16',nights:3,channel:'Booking',amount:780.00,status:'confirmed'},
+    {id:'RSV-20260512-017',guest:'Sato Yuki',initials:'SY',color:'#10B981',vip:'Standard',room:'1201',type:'Deluxe',cin:'5/15',cout:'5/19',nights:4,channel:'Agoda',amount:520.00,status:'pending'},
+    {id:'RSV-20260512-018',guest:'Kim Jun',initials:'KJ',color:'#F59E0B',vip:'Standard',room:'1401',type:'Premier',cin:'5/12',cout:'5/13',nights:1,channel:'Direct',amount:180.00,status:'checkout'},
+    {id:'RSV-20260512-019',guest:'Lee Hana',initials:'LH',color:'#8B5CF6',vip:'VIP Gold',room:'1402',type:'Premier',cin:'5/14',cout:'5/19',nights:5,channel:'Direct',amount:1250.00,status:'confirmed'},
+    {id:'RSV-20260512-020',guest:'Al Rashid',initials:'AR',color:'#EC4899',vip:'Standard',room:'PH02',type:'Penthouse',cin:'5/17',cout:'5/22',nights:5,channel:'Booking',amount:3000.00,status:'confirmed'},
+    {id:'RSV-20260512-021',guest:'Vo Duc',initials:'VD',color:'#3B82F6',vip:'Standard',room:'0301',type:'Standard',cin:'5/17',cout:'5/21',nights:4,channel:'Agoda',amount:360.00,status:'pending'},
+    {id:'RSV-20260512-022',guest:'Bui Tien',initials:'BT',color:'#10B981',vip:'Standard',room:'0503',type:'Standard',cin:'5/14',cout:'5/17',nights:3,channel:'Walk-in',amount:270.00,status:'pending'},
+    {id:'RSV-20260512-023',guest:'Nakamura',initials:'NM',color:'#F59E0B',vip:'Standard',room:'0801',type:'Deluxe',cin:'5/16',cout:'5/19',nights:3,channel:'Booking',amount:390.00,status:'confirmed'},
+    {id:'RSV-20260512-024',guest:'David C.',initials:'DC',color:'#8B5CF6',vip:'VIP',room:'1401',type:'Premier',cin:'5/15',cout:'5/19',nights:4,channel:'Direct',amount:1000.00,status:'cancelled'},
+];
+
+const statusConfig = {
+    confirmed: {label:'확정',cls:'confirmed'},
+    pending: {label:'대기',cls:'checkout'},
+    checkedin: {label:'체크인',cls:'checkin'},
+    checkout: {label:'체크아웃',cls:'vip'},
+    cancelled: {label:'취소',cls:'cancelled'}
+};
+
+let currentFilter = 'all';
+
+function renderTable() {
+    const tbody = document.getElementById('resBody');
+    const mobileContainer = document.getElementById('resMobileCards');
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    
+    const filtered = reservations.filter(r => {
+        if (currentFilter !== 'all' && r.status !== currentFilter) return false;
+        if (search && !r.guest.toLowerCase().includes(search) && !r.room.toLowerCase().includes(search) && !r.id.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    // Desktop table
+    tbody.innerHTML = filtered.map(r => {
+        const st = statusConfig[r.status];
+        const isVip = r.vip.includes('VIP') || r.vip.includes('Gold');
+        return `
+        <tr>
+            <td><input type="checkbox" class="row-check"></td>
+            <td><span class="res-id">${r.id}</span></td>
+            <td>
+                <div class="guest-cell">
+                    <div class="guest-avatar" style="background:${r.color}">${r.initials}</div>
+                    <div>
+                        ${r.guest}${isVip ? ' <i class="fa-solid fa-crown" style="color:#F59E0B;font-size:.6rem"></i>' : ''}
+                        <span style="font-size:.72rem;color:#9CA3AF;margin-left:6px">${r.vip}</span>
+                    </div>
+                </div>
+            </td>
+            <td><span class="room-tag">${r.room}</span></td>
+            <td>${r.type}</td>
+            <td>${r.cin}</td>
+            <td>${r.cout}</td>
+            <td>${r.nights}박</td>
+            <td><span class="channel-tag ${r.channel.toLowerCase().replace('-','')}">${r.channel}</span></td>
+            <td style="font-weight:700">$${r.amount.toLocaleString('en',{minimumFractionDigits:2})}</td>
+            <td><span class="status-badge ${st.cls}">${st.label}</span></td>
+            <td>
+                <div class="action-btns">
+                    <button class="act-btn" title="상세보기"><i class="fa-solid fa-eye"></i></button>
+                    <button class="act-btn" title="수정"><i class="fa-solid fa-pen"></i></button>
+                    <button class="act-btn danger" title="취소"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+
+    // Mobile cards
+    mobileContainer.innerHTML = filtered.map(r => {
+        const st = statusConfig[r.status];
+        const isVip = r.vip.includes('VIP') || r.vip.includes('Gold');
+        return `
+        <div class="m-res-card">
+            <div class="m-res-top">
+                <div class="m-res-guest">
+                    <div class="guest-avatar" style="background:${r.color}">${r.initials}</div>
+                    <div>
+                        <div class="m-res-name">${r.guest} ${isVip ? '<i class="fa-solid fa-crown" style="color:#F59E0B;font-size:.65rem"></i>' : ''}</div>
+                        <div class="m-res-sub">${r.vip}</div>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <span class="status-badge ${st.cls}">${st.label}</span>
+                    <div class="m-res-amount">$${r.amount.toLocaleString('en',{minimumFractionDigits:2})}</div>
+                </div>
+            </div>
+            <div class="m-res-details">
+                <div class="m-res-detail"><i class="fa-solid fa-door-open"></i> <span class="room-tag">${r.room}</span> ${r.type}</div>
+                <div class="m-res-detail"><i class="fa-solid fa-calendar"></i> ${r.cin} → ${r.cout} (${r.nights}박)</div>
+                <div class="m-res-detail"><i class="fa-solid fa-globe"></i> <span class="channel-tag ${r.channel.toLowerCase().replace('-','')}">${r.channel}</span></div>
+            </div>
+            <div class="m-res-actions">
+                <button class="act-btn"><i class="fa-solid fa-eye"></i> 상세</button>
+                <button class="act-btn"><i class="fa-solid fa-pen"></i> 수정</button>
+                <button class="act-btn danger"><i class="fa-solid fa-xmark"></i> 취소</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function setFilter(btn, filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+}
+
+function filterTable() { renderTable(); }
+function toggleAll() {
+    const checked = document.getElementById('checkAll').checked;
+    document.querySelectorAll('.row-check').forEach(c => c.checked = checked);
+}
+
+// ===== MOBILE MENU =====
+function toggleMenu() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.querySelector('.sidebar-overlay').classList.toggle('active');
+}
+
+// ===== BOTTOM SHEET =====
+function openResBS() {
+    document.getElementById('resBsOverlay').classList.add('active');
+    document.getElementById('resBsPanel').classList.add('active');
+}
+function closeResBS() {
+    document.getElementById('resBsOverlay').classList.remove('active');
+    document.getElementById('resBsPanel').classList.remove('active');
+}
+function selectResFilter(btn, filter, label) {
+    currentFilter = filter;
+    document.querySelectorAll('.bs-option').forEach(o => o.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('mResFilterLabel').textContent = label;
+    // Sync desktop chips
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    const target = document.querySelector(`.chip[data-filter="${filter}"]`);
+    if (target) target.classList.add('active');
+    closeResBS();
+    renderTable();
+}
+
+renderTable();
+
+// ===== i18n =====
+let currentLang = 'ko';
+const translations = {
+    ko: {
+        "예약 목록":"예약 목록","대시보드":"대시보드","예약 타임라인":"예약 타임라인",
+        "체크인/아웃":"체크인/아웃","투숙객 관리":"투숙객 관리","VIP 멤버십":"VIP 멤버십",
+        "객실 관리":"객실 관리","하우스키핑":"하우스키핑","통합 정산":"통합 정산",
+        "부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리",
+        "전체":"전체","확정":"확정","대기":"대기","체크인":"체크인","체크아웃":"체크아웃","취소":"취소",
+        "엑셀 다운":"엑셀 다운","신규 예약":"신규 예약",
+        "예약번호":"예약번호","투숙객":"투숙객","객실":"객실","유형":"유형",
+        "숙박":"숙박","채널":"채널","금액(USD)":"금액(USD)","상태":"상태","관리":"관리",
+        "Main":"Main","Front Desk":"Front Desk","Guest & CRM":"Guest & CRM",
+        "Operations":"Operations","Settings":"Settings"
+    },
+    en: {
+        "예약 목록":"Booking List","대시보드":"Dashboard","예약 타임라인":"Reservations",
+        "체크인/아웃":"Check-in/out","투숙객 관리":"Guest CRM","VIP 멤버십":"VIP Members",
+        "객실 관리":"Room Mgmt","하우스키핑":"Housekeeping","통합 정산":"Folio & Billing",
+        "부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt",
+        "전체":"All","확정":"Confirmed","대기":"Pending","체크인":"Check-in","체크아웃":"Check-out","취소":"Cancelled",
+        "엑셀 다운":"Export Excel","신규 예약":"New Booking",
+        "예약번호":"Booking #","투숙객":"Guest","객실":"Room","유형":"Type",
+        "숙박":"Stay","채널":"Channel","금액(USD)":"Amount(USD)","상태":"Status","관리":"Actions",
+        "Main":"Main","Front Desk":"Front Desk","Guest & CRM":"Guest & CRM",
+        "Operations":"Operations","Settings":"Settings"
+    }
+};
+function setupI18n(){
+    const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+    let node; const textNodes=[];
+    while(node=walk.nextNode()){
+        const orig=node.nodeValue,text=orig.trim();
+        if(text&&translations.ko[text]&&!node.parentNode.hasAttribute('data-i18n-key')){
+            const span=document.createElement('span');
+            span.setAttribute('data-i18n-key',text);span.textContent=text;
+            textNodes.push({node,span,originalText:orig});
+        }
+    }
+    textNodes.forEach(({node,span,originalText})=>{
+        const frag=document.createDocumentFragment();
+        const ls=originalText.match(/^\s+/),ts=originalText.match(/\s+$/);
+        if(ls)frag.appendChild(document.createTextNode(ls[0]));
+        frag.appendChild(span);
+        if(ts)frag.appendChild(document.createTextNode(ts[0]));
+        node.parentNode.replaceChild(frag,node);
+    });
+}
+function changeLang(lang){
+    currentLang=lang;
+    const dict=translations[lang]||translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(el=>{
+        const key=el.getAttribute('data-i18n-key');
+        if(dict[key])el.textContent=dict[key];
+    });
+    document.getElementById('searchInput').placeholder = lang==='en' ? 'Search by name, room, booking #...' : '이름, 객실번호, 예약번호 검색...';
+}
+// 모달 공통 함수
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+function saveNewRes() {
+    alert('새 예약이 성공적으로 저장되었습니다!');
+    closeModal('newResModal');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang);});
+</script>
+
+<!-- NEW RESERVATION MODAL -->
+<div class="modal-overlay" id="newResModal" onclick="if(event.target===this) closeModal('newResModal')">
+    <div class="modal-card" style="max-width:600px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">신규 예약 등록</h3>
+            <button class="modal-close" onclick="closeModal('newResModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">투숙객 이름 <span style="color:var(--danger)">*</span></label>
+                    <input type="text" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%" placeholder="예: John Doe">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">연락처</label>
+                    <input type="text" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%" placeholder="+84 000 0000">
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">체크인 <span style="color:var(--danger)">*</span></label>
+                    <input type="date" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">체크아웃 <span style="color:var(--danger)">*</span></label>
+                    <input type="date" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%">
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">객실 타입 <span style="color:var(--danger)">*</span></label>
+                    <select style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                        <option>Standard (스탠다드)</option>
+                        <option>Deluxe (디럭스)</option>
+                        <option>Suite (스위트)</option>
+                    </select>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">예약 채널</label>
+                    <select style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                        <option>Direct (직접 예약)</option>
+                        <option>Agoda (아고다)</option>
+                        <option>Booking.com</option>
+                        <option>Expedia</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">메모 및 요청사항</label>
+                <textarea style="min-height:80px;border:1px solid var(--border);border-radius:4px;padding:10px;font-family:var(--font);width:100%;resize:vertical" placeholder="공항 픽업 요청 등..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('newResModal')">취소</button>
+            <button class="btn-primary-sm" onclick="saveNewRes()"><i class="fa-solid fa-check"></i> 예약 저장</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

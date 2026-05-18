@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>체크인/아웃 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<!-- MOBILE OVERLAY -->
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>체크인/아웃</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <select class="hotel-select">
+                <option>🏨 The Grand Saigon</option>
+                <option>🏨 Azure Bangkok</option>
+                <option>🏨 Pearl Phnom Penh</option>
+            </select>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="margin-left:8px; width:110px">
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- TODAY SUMMARY KPI -->
+        <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
+            <div class="kpi-card blue">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fa-solid fa-right-to-bracket"></i></div>
+                </div>
+                <div class="kpi-value">24</div>
+                <div class="kpi-label">오늘 체크인 예정</div>
+                <div class="kpi-sub">확정 21 · 대기 3</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fa-solid fa-check-double"></i></div>
+                </div>
+                <div class="kpi-value">6</div>
+                <div class="kpi-label">체크인 완료</div>
+                <div class="kpi-sub">오늘 처리 완료</div>
+            </div>
+            <div class="kpi-card orange">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fa-solid fa-right-from-bracket"></i></div>
+                </div>
+                <div class="kpi-value">18</div>
+                <div class="kpi-label">오늘 체크아웃 예정</div>
+                <div class="kpi-sub">완료 12 · 잔여 6</div>
+            </div>
+            <div class="kpi-card purple">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fa-solid fa-crown"></i></div>
+                </div>
+                <div class="kpi-value">3</div>
+                <div class="kpi-label">VIP 도착 예정</div>
+                <div class="kpi-sub">환영 준비 필요</div>
+            </div>
+            <div class="kpi-card" style="border-left:3px solid var(--danger)">
+                <div class="kpi-top">
+                    <div class="kpi-icon" style="background:var(--danger-lt);color:var(--danger)"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                </div>
+                <div class="kpi-value">1</div>
+                <div class="kpi-label">No-show</div>
+                <div class="kpi-sub">자동 취소 대기</div>
+            </div>
+        </div>
+
+        <!-- TAB SWITCHER -->
+        <div class="tab-row">
+            <button class="tab-btn active" onclick="switchTab(this, 'checkin')"><i class="fa-solid fa-right-to-bracket"></i> 체크인 대기 <span class="tab-count">18</span></button>
+            <button class="tab-btn" onclick="switchTab(this, 'checkout')"><i class="fa-solid fa-right-from-bracket"></i> 체크아웃 대기 <span class="tab-count">6</span></button>
+        </div>
+
+        <!-- CHECK-IN QUEUE -->
+        <div class="ci-queue" id="checkinPanel">
+            <div class="ci-card" data-status="pending-ci">
+                <div class="ci-left">
+                    <div class="ci-avatar vip" style="background:#F59E0B">TL</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Tran Linh <span class="ci-vip-tag"><i class="fa-solid fa-crown"></i> VIP</span></div>
+                        <div class="ci-meta">PH01 · Penthouse · 4박 (5/12 – 5/16) · Direct</div>
+                        <div class="ci-note"><i class="fa-solid fa-bell-concierge"></i> 환영 꽃 & 샴페인 준비 요청</div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$2,400.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-ci" onclick="processCheckin(this)"><i class="fa-solid fa-right-to-bracket"></i> 체크인</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="ci-card" data-status="pending-ci">
+                <div class="ci-left">
+                    <div class="ci-avatar" style="background:#3B82F6">NT</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Nguyen Thi <span class="ci-tier-tag">Gold</span></div>
+                        <div class="ci-meta">1205 · Deluxe · 3박 (5/12 – 5/15) · Direct</div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$373.50</div>
+                    <div class="ci-actions">
+                        <button class="btn-ci" onclick="processCheckin(this)"><i class="fa-solid fa-right-to-bracket"></i> 체크인</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="ci-card" data-status="pending-ci">
+                <div class="ci-left">
+                    <div class="ci-avatar" style="background:#8B5CF6">JS</div>
+                    <div class="ci-info">
+                        <div class="ci-name">John Smith <span class="ci-tier-tag">Silver</span></div>
+                        <div class="ci-meta">0807 · Suite · 2박 (5/12 – 5/14) · Agoda</div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$520.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-ci" onclick="processCheckin(this)"><i class="fa-solid fa-right-to-bracket"></i> 체크인</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="ci-card" data-status="pending-ci">
+                <div class="ci-left">
+                    <div class="ci-avatar" style="background:#10B981">PK</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Park Kyung</div>
+                        <div class="ci-meta">0503 · Standard · 1박 (5/12 – 5/13) · Direct</div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$95.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-ci" onclick="processCheckin(this)"><i class="fa-solid fa-right-to-bracket"></i> 체크인</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="ci-card" data-status="pending-ci">
+                <div class="ci-left">
+                    <div class="ci-avatar vip" style="background:#EC4899">GM</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Garcia M. <span class="ci-vip-tag"><i class="fa-solid fa-crown"></i> VIP</span></div>
+                        <div class="ci-meta">1001 · Suite · 7박 (5/12 – 5/19) · Direct</div>
+                        <div class="ci-note"><i class="fa-solid fa-bell-concierge"></i> 얼리 체크인 요청 (12:00)</div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$2,100.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-ci" onclick="processCheckin(this)"><i class="fa-solid fa-right-to-bracket"></i> 체크인</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-pen"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="ci-card noshow" data-status="noshow">
+                <div class="ci-left">
+                    <div class="ci-avatar" style="background:#9CA3AF">XX</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Unknown Guest <span class="ci-noshow-tag"><i class="fa-solid fa-triangle-exclamation"></i> No-show</span></div>
+                        <div class="ci-meta">0302 · Standard · 2박 (5/12 – 5/14) · Walk-in</div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount" style="color:var(--danger)">$180.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-danger-sm"><i class="fa-solid fa-xmark"></i> 취소 처리</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHECK-OUT QUEUE (hidden by default) -->
+        <div class="ci-queue" id="checkoutPanel" style="display:none">
+            <div class="ci-card" data-status="pending-co">
+                <div class="ci-left">
+                    <div class="ci-avatar" style="background:#F59E0B">SJ</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Smith J.</div>
+                        <div class="ci-meta">0801 · Deluxe · 2박 (5/10 – 5/12) · Direct</div>
+                        <div class="ci-folio"><i class="fa-solid fa-receipt"></i> Folio 잔액: <b>$0.00</b> <span style="color:var(--success)">(정산 완료)</span></div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$260.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-co" onclick="processCheckout(this)"><i class="fa-solid fa-right-from-bracket"></i> 체크아웃</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-receipt"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="ci-card" data-status="pending-co">
+                <div class="ci-left">
+                    <div class="ci-avatar" style="background:#F59E0B">KJ</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Kim Jun</div>
+                        <div class="ci-meta">1401 · Premier · 1박 (5/11 – 5/12) · Direct</div>
+                        <div class="ci-folio"><i class="fa-solid fa-receipt"></i> Folio 잔액: <b>$45.00</b> <span style="color:var(--danger)">(미정산)</span></div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$225.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-co" onclick="processCheckout(this)"><i class="fa-solid fa-right-from-bracket"></i> 체크아웃</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-receipt"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="ci-card" data-status="pending-co">
+                <div class="ci-left">
+                    <div class="ci-avatar" style="background:#3B82F6">PS</div>
+                    <div class="ci-info">
+                        <div class="ci-name">Park Soo</div>
+                        <div class="ci-meta">0301 · Standard · 3박 (5/9 – 5/12) · Direct</div>
+                        <div class="ci-folio"><i class="fa-solid fa-receipt"></i> Folio 잔액: <b>$0.00</b> <span style="color:var(--success)">(정산 완료)</span></div>
+                    </div>
+                </div>
+                <div class="ci-right">
+                    <div class="ci-amount">$270.00</div>
+                    <div class="ci-actions">
+                        <button class="btn-co" onclick="processCheckout(this)"><i class="fa-solid fa-right-from-bracket"></i> 체크아웃</button>
+                        <button class="btn-icon-sm"><i class="fa-solid fa-receipt"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== TAB SWITCH =====
+function switchTab(btn, tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('checkinPanel').style.display = tab === 'checkin' ? 'flex' : 'none';
+    document.getElementById('checkoutPanel').style.display = tab === 'checkout' ? 'flex' : 'none';
+}
+
+// ===== CHECK-IN PROCESS =====
+function processCheckin(btn) {
+    const card = btn.closest('.ci-card');
+    const name = card.querySelector('.ci-name').textContent.trim();
+    if (confirm(`${name} 님을 체크인 처리하시겠습니까?`)) {
+        card.style.transition = 'all .4s ease';
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(40px)';
+        setTimeout(() => {
+            card.innerHTML = `
+                <div class="ci-left">
+                    <div class="ci-done-icon"><i class="fa-solid fa-check"></i></div>
+                    <div class="ci-info">
+                        <div class="ci-name" style="color:var(--success)">${name} — 체크인 완료</div>
+                        <div class="ci-meta">방금 처리됨 · ${new Date().toLocaleTimeString('ko',{hour:'2-digit',minute:'2-digit'})}</div>
+                    </div>
+                </div>
+            `;
+            card.classList.add('done');
+            card.style.opacity = '1';
+            card.style.transform = 'translateX(0)';
+        }, 400);
+    }
+}
+
+// ===== CHECK-OUT PROCESS =====
+function processCheckout(btn) {
+    const card = btn.closest('.ci-card');
+    const name = card.querySelector('.ci-name').textContent.trim();
+    const hasBalance = card.querySelector('.ci-folio b').textContent !== '$0.00';
+    if (hasBalance) {
+        alert('Folio 잔액이 남아 있습니다. 먼저 정산을 완료해 주세요.');
+        return;
+    }
+    if (confirm(`${name} 님을 체크아웃 처리하시겠습니까?`)) {
+        card.style.transition = 'all .4s ease';
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(40px)';
+        setTimeout(() => {
+            card.innerHTML = `
+                <div class="ci-left">
+                    <div class="ci-done-icon co"><i class="fa-solid fa-check"></i></div>
+                    <div class="ci-info">
+                        <div class="ci-name" style="color:var(--warning)">${name} — 체크아웃 완료</div>
+                        <div class="ci-meta">방금 처리됨 · ${new Date().toLocaleTimeString('ko',{hour:'2-digit',minute:'2-digit'})}</div>
+                    </div>
+                </div>
+            `;
+            card.classList.add('done');
+            card.style.opacity = '1';
+            card.style.transform = 'translateX(0)';
+        }, 400);
+    }
+}
+
+// ===== MOBILE MENU =====
+function toggleMenu() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.querySelector('.sidebar-overlay').classList.toggle('active');
+}
+
+// ===== i18n =====
+let currentLang = 'ko';
+const translations = {
+    ko: {
+        "체크인/아웃":"체크인/아웃","대시보드":"대시보드","예약 타임라인":"예약 타임라인",
+        "예약 목록":"예약 목록","투숙객 관리":"투숙객 관리","VIP 멤버십":"VIP 멤버십",
+        "객실 관리":"객실 관리","하우스키핑":"하우스키핑","통합 정산":"통합 정산",
+        "부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리",
+        "오늘 체크인 예정":"오늘 체크인 예정","체크인 완료":"체크인 완료",
+        "오늘 체크아웃 예정":"오늘 체크아웃 예정","VIP 도착 예정":"VIP 도착 예정",
+        "자동 취소 대기":"자동 취소 대기",
+        "체크인 대기":"체크인 대기","체크아웃 대기":"체크아웃 대기",
+        "체크인":"체크인","체크아웃":"체크아웃","취소 처리":"취소 처리",
+        "확정 21 · 대기 3":"확정 21 · 대기 3","오늘 처리 완료":"오늘 처리 완료",
+        "완료 12 · 잔여 6":"완료 12 · 잔여 6","환영 준비 필요":"환영 준비 필요",
+        "Main":"Main","Front Desk":"Front Desk","Guest & CRM":"Guest & CRM",
+        "Operations":"Operations","Settings":"Settings"
+    },
+    en: {
+        "체크인/아웃":"Check-in/out","대시보드":"Dashboard","예약 타임라인":"Reservations",
+        "예약 목록":"Booking List","투숙객 관리":"Guest CRM","VIP 멤버십":"VIP Members",
+        "객실 관리":"Room Mgmt","하우스키핑":"Housekeeping","통합 정산":"Folio & Billing",
+        "부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt",
+        "오늘 체크인 예정":"Today's Arrivals","체크인 완료":"Checked In",
+        "오늘 체크아웃 예정":"Today's Departures","VIP 도착 예정":"VIP Arrivals",
+        "자동 취소 대기":"Auto-cancel Pending",
+        "체크인 대기":"Check-in Queue","체크아웃 대기":"Check-out Queue",
+        "체크인":"Check-in","체크아웃":"Check-out","취소 처리":"Cancel",
+        "확정 21 · 대기 3":"21 Confirmed · 3 Pending","오늘 처리 완료":"Processed Today",
+        "완료 12 · 잔여 6":"12 Done · 6 Remaining","환영 준비 필요":"Welcome Prep Required",
+        "Main":"Main","Front Desk":"Front Desk","Guest & CRM":"Guest & CRM",
+        "Operations":"Operations","Settings":"Settings"
+    }
+};
+function setupI18n(){
+    const walk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);
+    let node; const textNodes=[];
+    while(node=walk.nextNode()){
+        const orig=node.nodeValue,text=orig.trim();
+        if(text&&translations.ko[text]&&!node.parentNode.hasAttribute('data-i18n-key')){
+            const span=document.createElement('span');
+            span.setAttribute('data-i18n-key',text);span.textContent=text;
+            textNodes.push({node,span,originalText:orig});
+        }
+    }
+    textNodes.forEach(({node,span,originalText})=>{
+        const frag=document.createDocumentFragment();
+        const ls=originalText.match(/^\s+/),ts=originalText.match(/\s+$/);
+        if(ls)frag.appendChild(document.createTextNode(ls[0]));
+        frag.appendChild(span);
+        if(ts)frag.appendChild(document.createTextNode(ts[0]));
+        node.parentNode.replaceChild(frag,node);
+    });
+}
+function changeLang(lang){
+    currentLang=lang;
+    const dict=translations[lang]||translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(el=>{
+        const key=el.getAttribute('data-i18n-key');
+        if(dict[key])el.textContent=dict[key];
+    });
+}
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang);});
+</script>
+</body>
+</html>

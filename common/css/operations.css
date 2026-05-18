@@ -1,0 +1,115 @@
+/* ===== OPERATIONS STYLES ===== */
+
+/* ===== ROOM GRID (Room Management) ===== */
+.floor-section { margin-bottom: 24px; }
+.floor-title { font-size: 1.1rem; font-weight: 700; color: var(--txt); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.floor-title i { color: var(--txt3); font-size: 0.9rem; }
+
+.room-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 14px;
+}
+
+.room-box {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.room-box:hover {
+    box-shadow: var(--shadow);
+    transform: translateY(-2px);
+    border-color: var(--border);
+}
+
+.room-box.occupied { border-top: 3px solid var(--primary); }
+.room-box.vacant-clean { border-top: 3px solid var(--success); }
+.room-box.vacant-dirty { border-top: 3px solid var(--warning); }
+.room-box.oos { border-top: 3px solid var(--danger); opacity: 0.8; }
+
+.room-box-num { font-size: 1.15rem; font-weight: 800; color: var(--txt); }
+.room-box-type { font-size: 0.7rem; color: var(--txt3); text-align: center; line-height: 1.2; }
+.room-box-status { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; margin-top: 4px; }
+
+.room-box.occupied .room-box-status { background: var(--primary-lt); color: var(--primary-dk); }
+.room-box.vacant-clean .room-box-status { background: var(--success-lt); color: var(--success); }
+.room-box.vacant-dirty .room-box-status { background: var(--warning-lt); color: var(--warning); }
+.room-box.oos .room-box-status { background: var(--danger-lt); color: var(--danger); }
+
+.room-guest-name { font-size: 0.75rem; font-weight: 600; color: var(--txt2); margin-top: 2px; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ===== HOUSEKEEPING LIST ===== */
+.hk-task-list { display: flex; flex-direction: column; gap: 16px; }
+.hk-task {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.hk-task:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-lt); }
+
+.hk-task-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
+.hk-task-room { 
+    width: 64px; height: 64px; 
+    border-radius: 14px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 1.2rem; font-weight: 800; 
+    flex-shrink: 0;
+}
+.hk-task.dirty .hk-task-room { background: var(--warning-lt); color: var(--warning); }
+.hk-task.clean .hk-task-room { background: var(--success-lt); color: var(--success); }
+.hk-task.inspect .hk-task-room { background: var(--purple-lt); color: var(--purple); }
+
+.hk-task-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.hk-task-title { font-size: 0.95rem; font-weight: 700; color: var(--txt); display: flex; align-items: center; gap: 8px; }
+.hk-task-meta { font-size: 0.8rem; color: var(--txt2); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hk-task-meta i { color: var(--txt3); }
+
+.hk-task-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.hk-maid-assign { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); padding: 4px 12px 4px 4px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--txt2); cursor: pointer; }
+.hk-maid-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--border2); display: flex; align-items: center; justify-content: center; color: var(--txt3); font-size: 0.7rem; }
+.hk-maid-assign.assigned .hk-maid-avatar { background: var(--primary); color: #fff; }
+
+/* ===== RESPONSIVE ===== */
+@media(max-width: 1024px) {
+    .room-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+}
+
+@media(max-width: 768px) {
+    .room-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .room-box { padding: 12px 8px; }
+    .room-box-num { font-size: 1.05rem; }
+    .room-box-status { font-size: 0.65rem; padding: 2px 8px; }
+    
+    .hk-task { flex-direction: column; align-items: flex-start; gap: 14px; padding: 14px 16px; }
+    .hk-task-left { width: 100%; }
+    .hk-task-right { width: 100%; flex-direction: column; gap: 8px; border-top: 1px solid var(--border2); padding-top: 12px; }
+    .hk-maid-assign { width: 100%; justify-content: center; padding: 10px; border-radius: var(--radius-sm); }
+    .hk-task-right .btn-primary-sm, .hk-task-right .btn-outline, .hk-task-right .btn-outline-sm { width: 100%; justify-content: center; padding: 10px; }
+}
+
+@media(max-width: 480px) {
+    .room-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .room-box { padding: 10px 6px; }
+    .room-box-type { font-size: 0.65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .hk-task-room { width: 52px; height: 52px; font-size: 1.05rem; border-radius: 12px; }
+    .hk-task-title { font-size: 0.9rem; }
+    .hk-task-meta { font-size: 0.75rem; gap: 8px; }
+    .hk-task-right { flex-direction: column; gap: 8px; }
+    .hk-maid-assign, .hk-task-right .btn-primary-sm, .hk-task-right .btn-outline { width: 100%; }
+}

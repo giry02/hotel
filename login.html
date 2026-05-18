@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="common/css/login.css">
+</head>
+<body>
+
+<!-- LEFT HERO -->
+<div class="login-hero">
+    <div class="hero-content">
+        <div class="hero-logo">H</div>
+        <h1 class="hero-title">HOTEL PMS</h1>
+        <p class="hero-sub">동남아시아 호텔을 위한 올인원 클라우드 관리 시스템. 예약, CRM, 정산을 하나로.</p>
+        <div class="hero-features">
+            <div class="hero-feat"><i class="fa-solid fa-shield-halved"></i> 멀티테넌시 기반 완벽한 데이터 격리</div>
+            <div class="hero-feat"><i class="fa-solid fa-globe"></i> 다국어 · 다통화 자동 변환 (VND, THB, KHR)</div>
+            <div class="hero-feat"><i class="fa-solid fa-crown"></i> VIP 멤버십 자동 승급 및 할인 적용</div>
+            <div class="hero-feat"><i class="fa-solid fa-chart-pie"></i> 실시간 KPI 대시보드 (OCC, ADR, RevPAR)</div>
+        </div>
+    </div>
+    <div class="hero-dots"><span class="active"></span><span></span><span></span></div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="login-panel">
+    <select class="lang-select" id="langSelect" onchange="changeLang(this.value)">
+        <option value="ko">🌐 한국어</option>
+        <option value="en">🌐 English</option>
+    </select>
+
+    <!-- === LOGIN FORM === -->
+    <div class="login-form" id="loginForm">
+        <div class="form-header">
+            <h2>로그인</h2>
+            <p>호텔 관리 시스템에 접속합니다</p>
+        </div>
+
+        <div class="form-error" id="loginError">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>이메일 또는 비밀번호가 올바르지 않습니다.</span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="email">이메일</label>
+            <input class="form-input" id="email" type="email" placeholder="staff@hotel.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="password">비밀번호</label>
+            <div class="input-wrap">
+                <input class="form-input" id="password" type="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password">
+                <button class="toggle-pw" type="button" onclick="togglePw()"><i class="fa-regular fa-eye"></i></button>
+            </div>
+        </div>
+
+        <div class="form-options">
+            <label><input type="checkbox" checked> 로그인 유지</label>
+            <a href="#">비밀번호 찾기</a>
+        </div>
+
+        <button class="btn-login" id="btnLogin" onclick="handleLogin()">
+            <span class="btn-text">로그인</span>
+            <span class="spinner"></span>
+        </button>
+
+
+        <div class="signup-link">
+            계정이 없으신가요?<a href="#" onclick="showSignup(event)">회원가입</a>
+        </div>
+    </div>
+
+    <!-- === SIGNUP FORM === -->
+    <div class="signup-panel" id="signupForm">
+        <div class="form-header">
+            <h2>회원가입</h2>
+            <p>호텔 관리자 계정을 생성합니다</p>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">호텔명</label>
+            <input class="form-input" type="text" placeholder="예: The Grand Saigon">
+        </div>
+        <div class="form-group">
+            <label class="form-label">담당자 이름</label>
+            <input class="form-input" type="text" placeholder="이름을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label class="form-label">이메일</label>
+            <input class="form-input" type="email" placeholder="admin@hotel.com">
+        </div>
+        <div class="form-group">
+            <label class="form-label">비밀번호</label>
+            <div class="input-wrap">
+                <input class="form-input" id="signupPw" type="password" placeholder="8자 이상, 영문+숫자 조합">
+                <button class="toggle-pw" type="button" onclick="toggleSignupPw()"><i class="fa-regular fa-eye"></i></button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">국가 / 타임존</label>
+            <select class="form-input">
+                <option>🇻🇳 Vietnam (Asia/Ho_Chi_Minh)</option>
+                <option>🇹🇭 Thailand (Asia/Bangkok)</option>
+                <option>🇰🇭 Cambodia (Asia/Phnom_Penh)</option>
+                <option>🇮🇩 Indonesia (Asia/Jakarta)</option>
+                <option>🇲🇾 Malaysia (Asia/Kuala_Lumpur)</option>
+                <option>🇵🇭 Philippines (Asia/Manila)</option>
+            </select>
+        </div>
+
+        <div class="form-options">
+            <label><input type="checkbox"> <span style="font-size:.72rem">이용약관 및 개인정보 처리방침에 동의합니다</span></label>
+        </div>
+
+        <button class="btn-login" onclick="handleSignup()">
+            <span class="btn-text">회원가입 신청</span>
+            <span class="spinner"></span>
+        </button>
+
+        <div class="signup-link" style="margin-top:20px">
+            이미 계정이 있으신가요?<a href="#" onclick="showLogin(event)">로그인</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle password visibility
+function togglePw(){
+    const pw=document.getElementById('password');
+    const icon=pw.nextElementSibling.querySelector('i');
+    if(pw.type==='password'){pw.type='text';icon.className='fa-regular fa-eye-slash'}
+    else{pw.type='password';icon.className='fa-regular fa-eye'}
+}
+function toggleSignupPw(){
+    const pw=document.getElementById('signupPw');
+    const icon=pw.nextElementSibling.querySelector('i');
+    if(pw.type==='password'){pw.type='text';icon.className='fa-regular fa-eye-slash'}
+    else{pw.type='password';icon.className='fa-regular fa-eye'}
+}
+
+// Switch forms
+function showSignup(e){
+    e.preventDefault();
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('signupForm').classList.add('active');
+}
+function showLogin(e){
+    e.preventDefault();
+    document.getElementById('signupForm').classList.remove('active');
+    document.getElementById('loginForm').classList.remove('hidden');
+}
+
+// Login handler
+function handleLogin(){
+    const btn=document.getElementById('btnLogin');
+    const err=document.getElementById('loginError');
+    const email=document.getElementById('email').value;
+    const pw=document.getElementById('password').value;
+
+    err.classList.remove('show');
+    btn.classList.add('loading');
+
+    setTimeout(()=>{
+        // Demo: any input works, empty fails
+        if(!email || !pw){
+            btn.classList.remove('loading');
+            err.classList.add('show');
+            return;
+        }
+        // 로그인 상태 저장
+        sessionStorage.setItem('pms_logged_in', 'true');
+        // Redirect to dashboard
+        window.location.href='dashboard.html';
+    }, 1200);
+}
+
+// Signup handler
+function handleSignup(){
+    const btn=event.target;
+    btn.classList.add('loading');
+    setTimeout(()=>{
+        btn.classList.remove('loading');
+        const msg = currentLang === 'en' ? 'Application received.\nWe will notify you via email after admin approval.' : '입점 신청이 접수되었습니다.\n관리자 승인 후 이메일로 안내드리겠습니다.';
+        alert(msg);
+        showLogin(new Event('click'));
+    },1500);
+}
+
+// Enter key
+document.getElementById('password').addEventListener('keydown',e=>{
+    if(e.key==='Enter') handleLogin();
+});
+
+// ===== i18n =====
+const translations = {
+    ko: {
+        "동남아시아 호텔을 위한 올인원 클라우드 관리 시스템. 예약, CRM, 정산을 하나로.": "동남아시아 호텔을 위한 올인원 클라우드 관리 시스템. 예약, CRM, 정산을 하나로.",
+        "멀티테넌시 기반 완벽한 데이터 격리": "멀티테넌시 기반 완벽한 데이터 격리",
+        "다국어 · 다통화 자동 변환 (VND, THB, KHR)": "다국어 · 다통화 자동 변환 (VND, THB, KHR)",
+        "VIP 멤버십 자동 승급 및 할인 적용": "VIP 멤버십 자동 승급 및 할인 적용",
+        "실시간 KPI 대시보드 (OCC, ADR, RevPAR)": "실시간 KPI 대시보드 (OCC, ADR, RevPAR)",
+        "로그인": "로그인",
+        "호텔 관리 시스템에 접속합니다": "호텔 관리 시스템에 접속합니다",
+        "이메일 또는 비밀번호가 올바르지 않습니다.": "이메일 또는 비밀번호가 올바르지 않습니다.",
+        "이메일": "이메일",
+        "비밀번호": "비밀번호",
+        "로그인 유지": "로그인 유지",
+        "비밀번호 찾기": "비밀번호 찾기",
+        "계정이 없으신가요?": "계정이 없으신가요?",
+        "회원가입": "회원가입",
+        "호텔 관리자 계정을 생성합니다": "호텔 관리자 계정을 생성합니다",
+        "호텔명": "호텔명",
+        "담당자 이름": "담당자 이름",
+        "국가 / 타임존": "국가 / 타임존",
+        "이용약관 및 개인정보 처리방침에 동의합니다": "이용약관 및 개인정보 처리방침에 동의합니다",
+        "회원가입 신청": "회원가입 신청",
+        "이미 계정이 있으신가요?": "이미 계정이 있으신가요?"
+    },
+    en: {
+        "동남아시아 호텔을 위한 올인원 클라우드 관리 시스템. 예약, CRM, 정산을 하나로.": "All-in-one cloud management system for Southeast Asian hotels. Reservations, CRM, and billing in one.",
+        "멀티테넌시 기반 완벽한 데이터 격리": "Multi-tenancy based perfect data isolation",
+        "다국어 · 다통화 자동 변환 (VND, THB, KHR)": "Auto translation & multi-currency (VND, THB, KHR)",
+        "VIP 멤버십 자동 승급 및 할인 적용": "Auto VIP membership upgrade and discount application",
+        "실시간 KPI 대시보드 (OCC, ADR, RevPAR)": "Real-time KPI dashboard (OCC, ADR, RevPAR)",
+        "로그인": "Login",
+        "호텔 관리 시스템에 접속합니다": "Access the hotel management system",
+        "이메일 또는 비밀번호가 올바르지 않습니다.": "Invalid email or password.",
+        "이메일": "Email",
+        "비밀번호": "Password",
+        "로그인 유지": "Keep me logged in",
+        "비밀번호 찾기": "Forgot password?",
+        "계정이 없으신가요?": "Don't have an account?",
+        "회원가입": "Sign up",
+        "호텔 관리자 계정을 생성합니다": "Create a hotel admin account",
+        "호텔명": "Hotel Name",
+        "담당자 이름": "Contact Name",
+        "국가 / 타임존": "Country / Timezone",
+        "이용약관 및 개인정보 처리방침에 동의합니다": "I agree to the Terms of Service and Privacy Policy",
+        "회원가입 신청": "Submit Application",
+        "이미 계정이 있으신가요?": "Already have an account?"
+    }
+};
+
+let currentLang = 'ko';
+
+function setupI18n() {
+    const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    const textNodes = [];
+    while (node = walk.nextNode()) {
+        const originalText = node.nodeValue;
+        const text = originalText.trim();
+        if (text && translations.ko[text] && !node.parentNode.hasAttribute('data-i18n-key')) {
+            const span = document.createElement('span');
+            span.setAttribute('data-i18n-key', text);
+            span.textContent = text;
+            textNodes.push({node, span, originalText});
+        }
+    }
+    textNodes.forEach(({node, span, originalText}) => {
+        const frag = document.createDocumentFragment();
+        const leadingSpace = originalText.match(/^\s+/);
+        const trailingSpace = originalText.match(/\s+$/);
+        if (leadingSpace) frag.appendChild(document.createTextNode(leadingSpace[0]));
+        frag.appendChild(span);
+        if (trailingSpace) frag.appendChild(document.createTextNode(trailingSpace[0]));
+        node.parentNode.replaceChild(frag, node);
+    });
+}
+
+function changeLang(lang) {
+    currentLang = lang;
+    const dict = translations[lang] || translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(el => {
+        const key = el.getAttribute('data-i18n-key');
+        if (dict[key]) el.textContent = dict[key];
+    });
+    
+    // Update placeholders manually since they aren't text nodes
+    if(lang === 'en') {
+        document.getElementById('password').placeholder = 'Enter password';
+        document.getElementById('signupPw').placeholder = '8+ chars, letters & numbers';
+        document.querySelectorAll('input[placeholder="예: The Grand Saigon"]').forEach(e=>e.placeholder = 'e.g. The Grand Saigon');
+        document.querySelectorAll('input[placeholder="이름을 입력하세요"]').forEach(e=>e.placeholder = 'Enter name');
+    } else {
+        document.getElementById('password').placeholder = '비밀번호를 입력하세요';
+        document.getElementById('signupPw').placeholder = '8자 이상, 영문+숫자 조합';
+        document.querySelectorAll('input[placeholder="e.g. The Grand Saigon"]').forEach(e=>e.placeholder = '예: The Grand Saigon');
+        document.querySelectorAll('input[placeholder="Enter name"]').forEach(e=>e.placeholder = '이름을 입력하세요');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupI18n();
+    changeLang(currentLang);
+});
+</script>
+</body>
+</html>

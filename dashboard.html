@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Dashboard — PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="common/css/dashboard.css">
+    <script src="common/js/sidebar.js"></script>
+</head>
+<body>
+
+<!-- MOBILE OVERLAY -->
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>대시보드</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="margin-left:8px; width:110px">
+                <option value="ko">🇰🇷 한국어</option>
+                <option value="en">🇺🇸 English</option>
+            </select>
+            <div class="notif-wrap">
+                <button class="topbar-btn" onclick="toggleNotifications(event)"><i class="fa-regular fa-bell"></i><span class="notif-dot"></span></button>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <h3>호텔 알림</h3>
+                        <span>모두 읽음 처리</span>
+                    </div>
+                    <div class="notif-list">
+                        <div class="notif-item urgent">
+                            <div class="notif-icon"><i class="fa-solid fa-bell-concierge"></i></div>
+                            <div class="notif-content">
+                                <div class="n-title">VIP 체크인 예정</div>
+                                <div class="n-desc">PH01 객실 Tran Linh 고객님이 30분 내 도착 예정입니다. 환영 준비를 확인해주세요.</div>
+                                <span class="n-time">방금 전</span>
+                            </div>
+                        </div>
+                        <div class="notif-item warning">
+                            <div class="notif-icon"><i class="fa-solid fa-broom"></i></div>
+                            <div class="notif-content">
+                                <div class="n-title">긴급 청소 요청</div>
+                                <div class="n-desc">0807 객실 고객이 수건 교체 및 미니바 정리를 요청했습니다.</div>
+                                <span class="n-time">12분 전</span>
+                            </div>
+                        </div>
+                        <div class="notif-item info">
+                            <div class="notif-icon"><i class="fa-solid fa-utensils"></i></div>
+                            <div class="notif-content">
+                                <div class="n-title">룸서비스 주문 접수</div>
+                                <div class="n-desc">1205 객실에서 클럽 샌드위치 2세트가 주문되었습니다.</div>
+                                <span class="n-time">45분 전</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+            <a class="kpi-card blue" href="operations/rooms.html" title="객실 관리로 이동">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-door-open"></i></div></div>
+                <div class="kpi-body">
+                    <div class="kpi-value">82.5%</div>
+                    <div class="kpi-label">객실 점유율 (OCC)</div>
+                    <div class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> 4.2%</div>
+                </div>
+            </a>
+            <a class="kpi-card green" href="operations/rates.html" title="요금 캘린더로 이동">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-dollar-sign"></i></div></div>
+                <div class="kpi-body">
+                    <div class="kpi-value">$124.50</div>
+                    <div class="kpi-label">평균 객실 단가 (ADR)</div>
+                    <div class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> 8.7%</div>
+                </div>
+            </a>
+            <a class="kpi-card orange" href="operations/folio.html" title="통합 정산으로 이동">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div></div>
+                <div class="kpi-body">
+                    <div class="kpi-value">$102.71</div>
+                    <div class="kpi-label">객실당 수익 (RevPAR)</div>
+                    <div class="kpi-trend up"><i class="fa-solid fa-arrow-up"></i> 12.3%</div>
+                </div>
+            </a>
+            <a class="kpi-card purple" href="frontdesk/checkin.html" title="체크인/아웃으로 이동">
+
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-right-to-bracket"></i></div></div>
+
+                <div class="kpi-body">
+
+                    <div class="kpi-value">24 / 18</div>
+
+                    <div class="kpi-label">오늘 체크인 / 체크아웃</div>
+
+                    <div class="kpi-trend down"><i class="fa-solid fa-arrow-down"></i> 2.1%</div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+
+
+        <!-- ROOM CHART SECTION: 차트(좌) + 요일 미니카드(우) -->
+        <div id="roomChartRow" style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;align-items:stretch">
+
+            <!-- 좌: 차트 카드 -->
+            <div class="card">
+                <div class="card-header">
+                    <a id="roomChartTitle" class="card-title card-title-link" href="operations/rooms.html"><i class="fa-solid fa-chart-column"></i> 주간 객실 현황</a>
+                    <div class="card-actions" id="roomChartBtns">
+                        <button class="active">주간</button>
+                        <button>월간</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="barChart" style="width:100%"></div>
+                </div>
+            </div>
+
+            <!-- 우: 요일별 현황 카드 -->
+            <div class="card" id="weeklyTableCard">
+                <div class="card-header">
+                    <span class="card-title" id="weeklyTableTitle"><i class="fa-solid fa-calendar-week"></i> 요일별 현황</span>
+                </div>
+                <div class="card-body" style="padding:12px;flex:1;display:flex;flex-direction:column">
+                    <div id="weeklyTable" style="display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:8px;flex:1"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- HK + TODAY TABLE -->
+        <div class="chart-row">
+            <div class="card">
+                <div class="card-header">
+                    <a class="card-title card-title-link" href="frontdesk/checkin.html"><i class="fa-solid fa-clock"></i> 오늘의 체크인 예정</a>
+                    <div class="card-actions"><a href="frontdesk/checkin.html" class="view-all-btn">전체보기 →</a></div>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>투숙객</th><th>객실</th><th>유형</th><th>기간</th><th>상태</th></tr></thead>
+                            <tbody>
+                                <tr><td><div class="guest-cell"><div class="guest-avatar" style="background:#3B82F6">NT</div><div>Nguyen Thi <span style="font-size:.62rem;color:#9CA3AF">VIP Gold</span></div></div></td><td>1205</td><td>Deluxe</td><td>5/12 - 5/15 (3N)</td><td><span class="status-badge confirmed">Confirmed</span></td></tr>
+                                <tr><td><div class="guest-cell"><div class="guest-avatar" style="background:#8B5CF6">JS</div><div>John Smith <span style="font-size:.62rem;color:#9CA3AF">Silver</span></div></div></td><td>0807</td><td>Suite</td><td>5/12 - 5/14 (2N)</td><td><span class="status-badge checkin">Check-in</span></td></tr>
+                                <tr><td><div class="guest-cell"><div class="guest-avatar" style="background:#10B981">PK</div><div>Park Kyung <span style="font-size:.62rem;color:#9CA3AF">Standard</span></div></div></td><td>0503</td><td>Standard</td><td>5/12 - 5/13 (1N)</td><td><span class="status-badge confirmed">Confirmed</span></td></tr>
+                                <tr><td><div class="guest-cell"><div class="guest-avatar" style="background:#F59E0B">TL</div><div>Tran Linh <span style="font-size:.62rem;color:#9CA3AF">VIP</span></div></div></td><td>PH01</td><td>Penthouse</td><td>5/12 - 5/16 (4N)</td><td><span class="status-badge vip">VIP Arrival</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <a class="card-title card-title-link" href="frontdesk/reservation-list.html"><i class="fa-solid fa-bolt"></i> 실시간 활동</a>
+                </div>
+                <div class="card-body">
+                    <div class="activity-list">
+                        <div class="activity-item"><div class="activity-icon ci"><i class="fa-solid fa-right-to-bracket"></i></div><div><div class="activity-text"><b>1205호</b> Nguyen Thi 체크인 완료</div><div class="activity-time">2분 전</div></div></div>
+                        <div class="activity-item"><div class="activity-icon hk"><i class="fa-solid fa-broom"></i></div><div><div class="activity-text"><b>0904호</b> 청소 완료 → Inspected</div><div class="activity-time">8분 전</div></div></div>
+                        <div class="activity-item"><div class="activity-icon pay"><i class="fa-solid fa-credit-card"></i></div><div><div class="activity-text"><b>0612호</b> Folio 정산 완료 ($485.00)</div><div class="activity-time">15분 전</div></div></div>
+                        <div class="activity-item"><div class="activity-icon co"><i class="fa-solid fa-right-from-bracket"></i></div><div><div class="activity-text"><b>1401호</b> Kim Jun 체크아웃</div><div class="activity-time">22분 전</div></div></div>
+                        <div class="activity-item"><div class="activity-icon ci"><i class="fa-solid fa-star"></i></div><div><div class="activity-text"><b>Tran Linh</b> VIP 승급 Gold → VIP</div><div class="activity-time">30분 전</div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANCILLARY SERVICES -->
+        <div class="chart-row">
+            <div class="card">
+                <div class="card-header">
+                    <a class="card-title card-title-link" href="operations/ancillary.html"><i class="fa-solid fa-concierge-bell"></i> 오늘의 부가서비스 주문</a>
+                    <div class="card-actions"><a href="operations/ancillary.html" class="view-all-btn">전체보기 →</a></div>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>시간</th><th>객실</th><th>서비스</th><th>항목</th><th>금액(USD)</th><th>처리</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td style="color:#9CA3AF;font-size:.72rem">14:32</td>
+                                    <td>1205</td>
+                                    <td><span style="display:inline-flex;align-items:center;gap:4px"><i class="fa-solid fa-utensils" style="color:#F59E0B;font-size:.7rem"></i> 룸서비스</span></td>
+                                    <td>클럽 샌드위치 × 2, 아이스 라떼 × 1</td>
+                                    <td style="font-weight:700">$38.00</td>
+                                    <td><span class="status-badge confirmed">완료</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#9CA3AF;font-size:.72rem">13:15</td>
+                                    <td>0807</td>
+                                    <td><span style="display:inline-flex;align-items:center;gap:4px"><i class="fa-solid fa-wine-glass" style="color:#8B5CF6;font-size:.7rem"></i> 미니바</span></td>
+                                    <td>맥주 × 3, 와인 × 1</td>
+                                    <td style="font-weight:700">$45.00</td>
+                                    <td><span class="status-badge confirmed">완료</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#9CA3AF;font-size:.72rem">12:40</td>
+                                    <td>PH01</td>
+                                    <td><span style="display:inline-flex;align-items:center;gap:4px"><i class="fa-solid fa-spa" style="color:#EC4899;font-size:.7rem"></i> 스파</span></td>
+                                    <td>아로마 테라피 90분 코스</td>
+                                    <td style="font-weight:700">$120.00</td>
+                                    <td><span class="status-badge checkin">진행 중</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#9CA3AF;font-size:.72rem">11:20</td>
+                                    <td>0503</td>
+                                    <td><span style="display:inline-flex;align-items:center;gap:4px"><i class="fa-solid fa-shirt" style="color:#3B82F6;font-size:.7rem"></i> 세탁</span></td>
+                                    <td>드라이클리닝 셔츠 × 3</td>
+                                    <td style="font-weight:700">$27.00</td>
+                                    <td><span class="status-badge checkout">수거 중</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="color:#9CA3AF;font-size:.72rem">10:05</td>
+                                    <td>1205</td>
+                                    <td><span style="display:inline-flex;align-items:center;gap:4px"><i class="fa-solid fa-golf-ball-tee" style="color:#10B981;font-size:.7rem"></i> 골프(외부)</span></td>
+                                    <td>DaLat Palace GC · 10:30 T/Off 2인</td>
+                                    <td style="font-weight:700">$240.00</td>
+                                    <td><span class="status-badge confirmed">예약확정</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <a class="card-title card-title-link" href="operations/ancillary.html"><i class="fa-solid fa-coins"></i> 부가서비스 매출</a>
+                    <div class="card-actions">
+                        <button class="active">오늘</button>
+                        <button>주간</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="text-align:center;margin-bottom:16px">
+                        <div style="font-size:2rem;font-weight:800;color:#111827">$1,285</div>
+                        <div style="font-size:.7rem;color:#6B7280">오늘 총 부가서비스 매출</div>
+                    </div>
+                    <div class="svc-breakdown" id="svcBreakdown"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOUSEKEEPING STATUS -->
+        <div class="card" style="margin-bottom:20px">
+            <div class="card-header">
+                <a class="card-title card-title-link" data-i18n-key="하우스키핑 현황" href="operations/housekeeping.html"><i class="fa-solid fa-broom"></i> 하우스키핑 현황</a>
+                <div class="card-actions"><a href="operations/housekeeping.html" class="view-all-btn" data-i18n-key="전체보기 →">전체보기 →</a></div>
+            </div>
+            <div class="card-body">
+                <a class="hk-grid hk-grid-link" href="operations/housekeeping.html">
+                    <div class="hk-item clean"><div class="hk-count">72</div><div class="hk-label" data-i18n-key="Clean">청소 완료</div></div>
+                    <div class="hk-item dirty"><div class="hk-count">18</div><div class="hk-label" data-i18n-key="Dirty">미청소</div></div>
+                    <div class="hk-item cleaning"><div class="hk-count">12</div><div class="hk-label" data-i18n-key="Cleaning">청소 중</div></div>
+                    <div class="hk-item inspected"><div class="hk-count">15</div><div class="hk-label" data-i18n-key="Inspected">점검 완료</div></div>
+                    <div class="hk-item oos"><div class="hk-count">3</div><div class="hk-label" data-i18n-key="OOS">점검 중(OOS)</div></div>
+                </a>
+            </div>
+        </div>
+
+        <!-- AD BANNER -->
+        <div class="ad-banner">
+            <div>
+                <h3>🎯 VinPearl Nha Trang — Summer Campaign</h3>
+                <p>타겟 광고 배너 영역 · 지역: Vietnam / Ho Chi Minh · CPM: $2.50</p>
+            </div>
+            <button class="ad-btn">광고 관리 →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ===== 주간 데이터 (prev 포함) =====
+const weekData = [
+    {day:'Mon', label:'월', occ:102, prev:96},
+    {day:'Tue', label:'화', occ:94,  prev:88},
+    {day:'Wed', label:'수', occ:110, prev:101},
+    {day:'Thu', label:'목', occ:106, prev:99},
+    {day:'Fri', label:'금', occ:114, prev:105},
+    {day:'Sat', label:'토', occ:118, prev:112},
+    {day:'Sun', label:'일', occ:98,  prev:95}
+];
+const monthData = [
+    {day:'5/1',occ:88},{day:'5/2',occ:91},{day:'5/3',occ:95},{day:'5/4',occ:105},
+    {day:'5/5',occ:108},{day:'5/6',occ:112},{day:'5/7',occ:98},{day:'5/8',occ:90},
+    {day:'5/9',occ:93},{day:'5/10',occ:97},{day:'5/11',occ:102},{day:'5/12',occ:106},
+    {day:'5/13',occ:114},{day:'5/14',occ:118},{day:'5/15',occ:98},{day:'5/16',occ:85},
+    {day:'5/17',occ:89},{day:'5/18',occ:94},{day:'5/19',occ:100},{day:'5/20',occ:107},
+    {day:'5/21',occ:115},{day:'5/22',occ:119},{day:'5/23',occ:96},{day:'5/24',occ:88},
+    {day:'5/25',occ:92},{day:'5/26',occ:97},{day:'5/27',occ:103},{day:'5/28',occ:110},
+    {day:'5/29',occ:116},{day:'5/30',occ:120},{day:'5/31',occ:99}
+];
+
+function renderRoomChart(data, isMonthly) {
+    const bc        = document.getElementById('barChart');
+    const tableCard = document.getElementById('weeklyTableCard');
+    const tableDiv  = document.getElementById('weeklyTable');
+    const titleEl   = document.getElementById('roomChartTitle');
+    if (!bc) return;
+
+    const isEn = currentLang === 'en';
+    if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-chart-column"></i> ${isMonthly ? (isEn?'Monthly':'월간') : (isEn?'Weekly':'주간')} ${isEn?'Room Status':'객실 현황'}`;
+    bc.innerHTML = '';
+    if (tableDiv) tableDiv.innerHTML = '';
+
+    /* 월간: 오른쪽 카드 숨기고 차트 전체 너비 / 주간: 복원 */
+    if (tableCard) tableCard.style.display = isMonthly ? 'none' : '';
+    const row = document.getElementById('roomChartRow');
+    if (row) row.style.gridTemplateColumns = isMonthly ? '1fr' : '2fr 1fr';
+
+    /* 월간 차트 */
+    if (isMonthly) {
+        bc.style.cssText = 'height:220px;width:100%;overflow-x:auto;overflow-y:hidden;display:block';
+        const maxVal = Math.max(...data.map(d => d.occ));
+        const inner  = document.createElement('div');
+        const minW   = 32 * data.length;
+        inner.style.cssText = `display:flex;align-items:flex-end;gap:3px;height:100%;width:${minW > bc.offsetWidth ? minW+'px' : '100%'};min-width:100%`;
+        data.forEach(d => {
+            const g = document.createElement('div');
+            g.style.cssText = 'flex:1;min-width:28px;display:flex;flex-direction:column;align-items:center;height:100%';
+            g.innerHTML = `<div style="font-size:.56rem;font-weight:700;color:var(--txt);flex-shrink:0;margin-bottom:2px">${d.occ}</div><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="height:${(d.occ/maxVal*100).toFixed(0)}%;width:100%;background:var(--primary);border-radius:3px 3px 0 0"></div></div><div style="font-size:.56rem;color:var(--txt2);margin-top:3px;flex-shrink:0">${d.day}</div>`;
+            inner.appendChild(g);
+        });
+        bc.appendChild(inner);
+        return;
+    }
+
+    /* 주간 이중 막대 차트 — 고정 높이로 렌더링 */
+    bc.style.cssText = 'width:100%;height:200px;display:flex;align-items:flex-end;gap:6px;overflow:visible';
+    const maxVal = Math.max(...data.map(d => Math.max(d.occ, d.prev)));
+    data.forEach(d => {
+        const oP = (d.occ/maxVal*100).toFixed(0), prP = (d.prev/maxVal*100).toFixed(0);
+        const diff = d.occ - d.prev, isUp = diff >= 0;
+        const g = document.createElement('div');
+        g.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;height:100%';
+        g.innerHTML = `<div style="flex:1;width:100%;display:flex;align-items:flex-end;gap:2px"><div style="flex:1;height:${oP}%;background:var(--primary);border-radius:3px 3px 0 0"></div><div style="flex:1;height:${prP}%;background:#D1D5DB;border-radius:3px 3px 0 0"></div></div><div style="font-size:.65rem;color:var(--txt2);margin-top:4px;flex-shrink:0">${d.label}</div><div style="font-size:.58rem;font-weight:600;color:${isUp?'var(--success)':'var(--danger)'};margin-top:1px;flex-shrink:0">${isUp?'+':''}${diff}</div>`;
+        bc.appendChild(g);
+    });
+
+    /* 요일 미니 카드 — 한 줄: [요일] [숫자] [증감] */
+    if (!tableDiv) return;
+    const total = data.reduce((a,d) => ({occ:a.occ+d.occ, prev:a.prev+d.prev}), {occ:0,prev:0});
+    const items = [...data, {label:'합계', occ:total.occ, prev:total.prev, isTotal:true}];
+
+    items.forEach((d, i) => {
+        const diff = d.occ - d.prev, isUp = diff >= 0;
+        const isEn = currentLang === 'en';
+        const el = document.createElement('div');
+        const isTotal = d.isTotal;
+
+        /* 표시 레이블: 언어에 따라 전환 */
+        const dispLabel = isTotal
+            ? (isEn ? 'Total' : '합계')
+            : (isEn ? d.day : d.label);
+
+        if (isTotal) {
+            el.style.cssText = 'display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 6px;border-radius:10px;background:linear-gradient(135deg,var(--primary) 0%,#2563EB 100%);text-align:center';
+            el.innerHTML = `
+                <div style="font-size:.85rem;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:.5px;margin-bottom:4px">${dispLabel}</div>
+                <div style="font-size:1.7rem;font-weight:800;color:#fff;line-height:1">${d.occ}</div>
+                <div style="margin-top:5px;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(255,255,255,.2);color:#fff">${isUp?'+':''}${diff}</div>`;
+        } else {
+            /* 토(Sat)=파랑, 일(Sun)=빨강 */
+            const isSat = d.day === 'Sat';
+            const isSun = d.day === 'Sun';
+            const labelColor = isSat ? '#3B82F6' : isSun ? '#EF4444' : 'var(--txt2)';
+            const cardBg     = isSat ? 'rgba(59,130,246,.07)' : isSun ? 'rgba(239,68,68,.07)' : 'var(--bg)';
+            const borderClr  = isSat ? 'rgba(59,130,246,.25)' : isSun ? 'rgba(239,68,68,.25)' : 'transparent';
+            el.style.cssText = `display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 6px;border-radius:10px;background:${cardBg};border:1px solid ${borderClr};text-align:center`;
+            el.innerHTML = `
+                <div style="font-size:.9rem;font-weight:800;color:${labelColor};letter-spacing:.5px;margin-bottom:4px">${dispLabel}</div>
+                <div style="font-size:1.35rem;font-weight:800;color:var(--txt);line-height:1">${d.occ}</div>
+                <div style="margin-top:5px;padding:2px 8px;border-radius:20px;font-size:.68rem;font-weight:700;background:${isUp?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'};color:${isUp?'var(--success)':'var(--danger)'}">${isUp?'+':''}${diff}</div>`;
+        }
+        tableDiv.appendChild(el);
+    });
+}
+
+/* currentLang 선언을 여기서 해서 renderRoomChart 사용 가능 */
+let currentLang = 'ko';
+
+renderRoomChart(weekData, false);
+
+// 주간/월간 버튼 (인덱스로 판단 — 언어 무관)
+const roomBtns = document.querySelectorAll('#roomChartBtns button');
+roomBtns.forEach((btn, idx) => {
+    btn.addEventListener('click', () => {
+        roomBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const monthly = idx === 1; // 0=주간, 1=월간
+        renderRoomChart(monthly ? monthData : weekData, monthly);
+    });
+});
+// ===== SERVICE BREAKDOWN =====
+window.svcData = [
+    { name: '스파', val: 540, pct: 42, icon: 'fa-spa', color: '#EC4899' },
+    { name: '외부 대행', val: 320, pct: 25, icon: 'fa-golf-ball-tee', color: '#10B981' },
+    { name: '룸서비스', val: 215, pct: 17, icon: 'fa-utensils', color: '#F59E0B' },
+    { name: '미니바', val: 120, pct: 9, icon: 'fa-wine-glass', color: '#8B5CF6' },
+    { name: '세탁', val: 90, pct: 7, icon: 'fa-shirt', color: '#3B82F6' }
+];
+const svcBk = document.getElementById('svcBreakdown');
+if(svcBk) {
+    svcData.forEach(s => {
+        const row = document.createElement('div');
+        row.className = 'svc-row';
+        row.innerHTML = `
+            <div class="svc-icon" style="background:${s.color}1A; color:${s.color}"><i class="fa-solid ${s.icon}"></i></div>
+            <div class="svc-name">${s.name}</div>
+            <div class="svc-bar-bg"><div class="svc-bar" style="width:0; background:${s.color}"></div></div>
+            <div class="svc-val">$${s.val}</div>
+        `;
+        svcBk.appendChild(row);
+        
+        // Animate bar
+        setTimeout(() => {
+            row.querySelector('.svc-bar').style.width = s.pct + '%';
+        }, 300);
+    });
+}
+
+// ===== CARD ACTION TOGGLE =====
+document.querySelectorAll('.card-actions').forEach(group => {
+    group.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            group.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+});
+
+// ===== LIVE CLOCK =====
+// currentLang은 위에서 선언
+
+function updateDate() {
+    const now = new Date();
+    const opts = {year:'numeric',month:'long',day:'numeric',weekday:'short'};
+    const badge = document.querySelector('.date-badge');
+    if(badge) {
+        const locale = currentLang === 'en' ? 'en-US' : 'ko-KR';
+        const dateStr = now.toLocaleDateString(locale, opts);
+        const timeStr = now.toLocaleTimeString(locale, {hour:'2-digit',minute:'2-digit'});
+        badge.innerHTML = `<i class="fa-regular fa-calendar"></i> ${dateStr} ${timeStr}`;
+    }
+}
+updateDate();
+setInterval(updateDate, 60000);
+
+// ===== MOBILE MENU TOGGLE =====
+function toggleMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+// ===== NOTIFICATION TOGGLE =====
+function toggleNotifications(e) {
+    e.stopPropagation();
+    document.getElementById('notifDropdown').classList.toggle('active');
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('notifDropdown');
+    const wrap = document.querySelector('.notif-wrap');
+    if (dropdown.classList.contains('active') && !wrap.contains(e.target)) {
+        dropdown.classList.remove('active');
+    }
+});
+
+// ===== i18n =====
+const translations = {
+    ko: {
+        "대시보드": "대시보드",
+        "예약 타임라인": "예약 타임라인",
+        "예약 목록": "예약 목록",
+        "체크인/아웃": "체크인/아웃",
+        "투숙객 관리": "투숙객 관리",
+        "VIP 멤버십": "VIP 멤버십",
+        "객실 관리": "객실 관리",
+        "요금 캘린더": "요금 캘린더",
+        "하우스키핑": "하우스키핑",
+        "통합 정산": "통합 정산",
+        "부가서비스": "부가서비스",
+        "호텔 설정": "호텔 설정",
+        "직원 관리": "직원 관리",
+        "객실 현황/목록": "객실 현황/목록",
+        "객실/유형 등록": "객실/유형 등록",
+        "정산 목록": "정산 목록",
+        "매출 분석": "매출 분석",
+        "골프장": "골프장",
+        "렌트카": "렌트카",
+        "호텔 알림": "호텔 알림",
+        "모두 읽음 처리": "모두 읽음 처리",
+        "객실 점유율 (OCC)": "객실 점유율 (OCC)",
+        "총 120실 중 99실 판매": "총 120실 중 99실 판매",
+        "평균 객실 단가 (ADR)": "평균 객실 단가 (ADR)",
+        "전주 대비 +$10.00": "전주 대비 +$10.00",
+        "객실당 수익 (RevPAR)": "객실당 수익 (RevPAR)",
+        "오늘 체크인 / 체크아웃": "오늘 체크인 / 체크아웃",
+        "대기 3건 · No-show 1건": "대기 3건 · No-show 1건",
+        "주간 객실 현황": "주간 객실 현황",
+        "주간": "주간",
+        "월간": "월간",
+        "예약 채널 비율": "예약 채널 비율",
+        "총 예약": "총 예약",
+        "오늘의 체크인 예정": "오늘의 체크인 예정",
+        "전체보기 →": "전체보기 →",
+        "투숙객": "투숙객",
+        "객실": "객실",
+        "유형": "유형",
+        "기간": "기간",
+        "상태": "상태",
+        "하우스키핑 현황": "하우스키핑 현황",
+        "실시간 활동": "실시간 활동",
+        "오늘의 부가서비스 주문": "오늘의 부가서비스 주문",
+        "부가서비스 매출": "부가서비스 매출",
+        "오늘": "오늘",
+        "시간": "시간",
+        "서비스": "서비스",
+        "항목": "항목",
+        "금액(USD)": "금액(USD)",
+        "처리": "처리",
+        "오늘 총 부가서비스 매출": "오늘 총 부가서비스 매출",
+        "완료": "완료",
+        "진행 중": "진행 중",
+        "수거 중": "수거 중",
+        "예약확정": "예약확정",
+        "스파": "스파",
+        "외부 대행": "외부 대행",
+        "룸서비스": "룸서비스",
+        "미니바": "미니바",
+        "세탁": "세탁",
+        "Main": "Main",
+        "Front Desk": "Front Desk",
+        "Guest & CRM": "Guest & CRM",
+        "Operations": "Operations",
+        "Settings": "Settings",
+        /* 하우스키핑 상태 */
+        "Clean": "청소 완료",
+        "Dirty": "미청소",
+        "Cleaning": "청소 중",
+        "Inspected": "점검 완료",
+        "OOS": "점검 중(OOS)",
+
+        /* 하우스키핑 상태 */
+        "Clean": "Clean",
+        "Dirty": "Dirty",
+        "Cleaning": "Cleaning",
+        "Inspected": "Inspected",
+        "OOS": "OOS",
+
+        /* 하우스키핑 상태 */
+        "Clean": "청소 완료",
+        "Dirty": "미청소",
+        "Cleaning": "청소 중",
+        "Inspected": "점검 완료",
+        "OOS": "점검 중(OOS)",
+
+        
+        /* 알림 내역 */
+        "VIP 체크인 예정": "VIP 체크인 예정",
+        "PH01 객실 Tran Linh 고객님이 30분 내 도착 예정입니다. 환영 준비를 확인해주세요.": "PH01 객실 Tran Linh 고객님이 30분 내 도착 예정입니다. 환영 준비를 확인해주세요.",
+        "방금 전": "방금 전",
+        "긴급 청소 요청": "긴급 청소 요청",
+        "0807 객실 고객이 수건 교체 및 미니바 정리를 요청했습니다.": "0807 객실 고객이 수건 교체 및 미니바 정리를 요청했습니다.",
+        "12분 전": "12분 전",
+        "룸서비스 주문 접수": "룸서비스 주문 접수",
+        "1205 객실에서 클럽 샌드위치 2세트가 주문되었습니다.": "1205 객실에서 클럽 샌드위치 2세트가 주문되었습니다.",
+        "45분 전": "45분 전",
+
+        /* 실시간 활동 내역 */
+        "1205호": "1205호",
+        "Nguyen Thi 체크인 완료": "Nguyen Thi 체크인 완료",
+        "2분 전": "2분 전",
+        "0904호": "0904호",
+        "청소 완료 → Inspected": "청소 완료 → Inspected",
+        "8분 전": "8분 전",
+        "0612호": "0612호",
+        "Folio 정산 완료 ($485.00)": "Folio 정산 완료 ($485.00)",
+        "15분 전": "15분 전",
+        "1401호": "1401호",
+        "Kim Jun 체크아웃": "Kim Jun 체크아웃",
+        "22분 전": "22분 전",
+        "Tran Linh": "Tran Linh",
+        "VIP 승급 Gold → VIP": "VIP 승급 Gold → VIP",
+        "30분 전": "30분 전",
+
+        /* 부가서비스 내역 */
+        "클럽 샌드위치 × 2, 아이스 라떼 × 1": "클럽 샌드위치 × 2, 아이스 라떼 × 1",
+        "맥주 × 3, 와인 × 1": "맥주 × 3, 와인 × 1",
+        "아로마 테라피 90분 코스": "아로마 테라피 90분 코스",
+        "드라이클리닝 셔츠 × 3": "드라이클리닝 셔츠 × 3",
+        "DaLat Palace GC · 10:30 T/Off 2인": "DaLat Palace GC · 10:30 T/Off 2인",
+
+        /* 광고 배너 */
+        "타겟 광고 배너 영역 · 지역: Vietnam / Ho Chi Minh · CPM: $2.50": "타겟 광고 배너 영역 · 지역: Vietnam / Ho Chi Minh · CPM: $2.50",
+        "광고 관리 →": "광고 관리 →"
+    },
+    en: {
+        "대시보드": "Dashboard",
+        "예약 타임라인": "Reservations",
+        "예약 목록": "Booking List",
+        "체크인/아웃": "Check-in/out",
+        "투숙객 관리": "Guest CRM",
+        "VIP 멤버십": "VIP Members",
+        "객실 관리": "Room Mgmt",
+        "요금 캘린더": "Rates Calendar",
+        "하우스키핑": "Housekeeping",
+        "통합 정산": "Folio & Billing",
+        "부가서비스": "Ancillary Svcs",
+        "호텔 설정": "Hotel Settings",
+        "직원 관리": "Staff Mgmt",
+        "객실 현황/목록": "Room List",
+        "객실/유형 등록": "Room Setup",
+        "정산 목록": "Folio List",
+        "매출 분석": "Revenue Analytics",
+        "골프장": "Golf",
+        "렌트카": "Rent-a-Car",
+        "호텔 알림": "Notifications",
+        "모두 읽음 처리": "Mark all read",
+        "객실 점유율 (OCC)": "Occupancy (OCC)",
+        "총 120실 중 99실 판매": "99 of 120 rooms sold",
+        "평균 객실 단가 (ADR)": "Average Daily Rate (ADR)",
+        "전주 대비 +$10.00": "+$10.00 from last week",
+        "객실당 수익 (RevPAR)": "Rev. per Available Room",
+        "오늘 체크인 / 체크아웃": "Today's Check-in / out",
+        "대기 3건 · No-show 1건": "3 Waitlist · 1 No-show",
+        "주간 객실 현황": "Weekly Room Status",
+        "주간": "Weekly",
+        "월간": "Monthly",
+        "예약 채널 비율": "Booking Channels",
+        "총 예약": "Total Bookings",
+        "오늘의 체크인 예정": "Today's Arrivals",
+        "전체보기 →": "View All →",
+        "투숙객": "Guest",
+        "객실": "Room",
+        "유형": "Type",
+        "기간": "Duration",
+        "상태": "Status",
+        "하우스키핑 현황": "HK Status",
+        "실시간 활동": "Live Activity",
+        "오늘의 부가서비스 주문": "Today's Ancillary Orders",
+        "부가서비스 매출": "Ancillary Revenue",
+        "오늘": "Today",
+        "시간": "Time",
+        "서비스": "Service",
+        "항목": "Item",
+        "금액(USD)": "Amount(USD)",
+        "처리": "Action",
+        "오늘 총 부가서비스 매출": "Today's Total Revenue",
+        "완료": "Done",
+        "진행 중": "In Progress",
+        "수거 중": "Collecting",
+        "예약확정": "Confirmed",
+        "스파": "Spa",
+        "외부 대행": "External",
+        "룸서비스": "Room Svc",
+        "미니바": "Minibar",
+        "세탁": "Laundry",
+        "Main": "Main",
+        "Front Desk": "Front Desk",
+        "Guest & CRM": "Guest & CRM",
+        "Operations": "Operations",
+        "Settings": "Settings",
+        /* 하우스키핑 상태 */
+        "Clean": "Clean",
+        "Dirty": "Dirty",
+        "Cleaning": "Cleaning",
+        "Inspected": "Inspected",
+        "OOS": "OOS",
+
+        /* 알림 내역 */
+        "VIP 체크인 예정": "VIP Arrival Expected",
+        "PH01 객실 Tran Linh 고객님이 30분 내 도착 예정입니다. 환영 준비를 확인해주세요.": "Guest Tran Linh (PH01) arriving in 30 mins. Please prepare welcome.",
+        "방금 전": "Just now",
+        "긴급 청소 요청": "Urgent Cleaning",
+        "0807 객실 고객이 수건 교체 및 미니바 정리를 요청했습니다.": "Room 0807 requested fresh towels and minibar restock.",
+        "12분 전": "12m ago",
+        "룸서비스 주문 접수": "Room Svc Order",
+        "1205 객실에서 클럽 샌드위치 2세트가 주문되었습니다.": "2 Club Sandwiches ordered by Room 1205.",
+        "45분 전": "45m ago",
+
+        /* 실시간 활동 내역 */
+        "1205호": "Rm 1205",
+        "Nguyen Thi 체크인 완료": "Nguyen Thi Checked in",
+        "2분 전": "2m ago",
+        "0904호": "Rm 0904",
+        "청소 완료 → Inspected": "Cleaned → Inspected",
+        "8분 전": "8m ago",
+        "0612호": "Rm 0612",
+        "Folio 정산 완료 ($485.00)": "Folio Settled ($485.00)",
+        "15분 전": "15m ago",
+        "1401호": "Rm 1401",
+        "Kim Jun 체크아웃": "Kim Jun Checked out",
+        "22분 전": "22m ago",
+        "Tran Linh": "Tran Linh",
+        "VIP 승급 Gold → VIP": "VIP Upgrade Gold → VIP",
+        "30분 전": "30m ago",
+
+        /* 부가서비스 내역 */
+        "클럽 샌드위치 × 2, 아이스 라떼 × 1": "Club Sandwich x2, Iced Latte x1",
+        "맥주 × 3, 와인 × 1": "Beer x3, Wine x1",
+        "아로마 테라피 90분 코스": "Aromatherapy 90 min course",
+        "드라이클리닝 셔츠 × 3": "Dry Cleaning Shirt x3",
+        "DaLat Palace GC · 10:30 T/Off 2인": "DaLat Palace GC · 10:30 T/Off 2 pax",
+
+        /* 광고 배너 */
+        "타겟 광고 배너 영역 · 지역: Vietnam / Ho Chi Minh · CPM: $2.50": "Target Ad Banner · Region: Vietnam / HCMC · CPM: $2.50",
+        "광고 관리 →": "Manage Ads →"
+    }
+};
+
+// Map original strings using data-i18n attribute for easier replacement
+function setupI18n() {
+    // Only target nodes without children to avoid blowing up html
+    const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+    let node;
+    const textNodes = [];
+    while (node = walk.nextNode()) {
+        const originalText = node.nodeValue;
+        const text = originalText.trim();
+        if (text && translations.ko[text] && !node.parentNode.hasAttribute('data-i18n-key')) {
+            const span = document.createElement('span');
+            span.setAttribute('data-i18n-key', text);
+            span.textContent = text;
+            textNodes.push({node, span, originalText});
+        }
+    }
+    // Replace text nodes with spans
+    textNodes.forEach(({node, span, originalText}) => {
+        const frag = document.createDocumentFragment();
+        const leadingSpace = originalText.match(/^\s+/);
+        const trailingSpace = originalText.match(/\s+$/);
+        if (leadingSpace) frag.appendChild(document.createTextNode(leadingSpace[0]));
+        frag.appendChild(span);
+        if (trailingSpace) frag.appendChild(document.createTextNode(trailingSpace[0]));
+        node.parentNode.replaceChild(frag, node);
+    });
+}
+
+window.changeLang = function(lang) {
+    currentLang = lang;
+    const dict = translations[lang] || translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(el => {
+        const key = el.getAttribute('data-i18n-key');
+        if (dict[key]) el.textContent = dict[key];
+    });
+    
+    // update dynamic js data
+    if(window.svcData && document.getElementById('svcBreakdown')) {
+        document.getElementById('svcBreakdown').innerHTML = '';
+        window.svcData.forEach(s => {
+            const name = dict[s.name] || s.name;
+            const row = document.createElement('div');
+            row.className = 'svc-row';
+            row.innerHTML = `
+                <div class="svc-icon" style="background:${s.color}1A; color:${s.color}"><i class="fa-solid ${s.icon}"></i></div>
+                <div class="svc-name">${name}</div>
+                <div class="svc-bar-bg"><div class="svc-bar" style="width:${s.pct}%; background:${s.color}"></div></div>
+                <div class="svc-val">$${s.val}</div>
+            `;
+            document.getElementById('svcBreakdown').appendChild(row);
+        });
+    }
+    
+    updateDate(); // refresh date formatting
+
+    /* 언어 변경 시 제목 직접 업데이트 */
+    const isEn2 = lang === 'en';
+    const wtt = document.getElementById('weeklyTableTitle');
+    if (wtt) wtt.innerHTML = `<i class="fa-solid fa-calendar-week"></i> ${isEn2 ? 'Daily Summary' : '요일별 현황'}`;
+
+    /* 현재 선택된 버튼 인덱스로 monthly 판단 (텍스트 무관) */
+    const allRoomBtns = Array.from(document.querySelectorAll('#roomChartBtns button'));
+    const activeIdx = allRoomBtns.findIndex(b => b.classList.contains('active'));
+    const isMonthlyNow = activeIdx === 1;
+    renderRoomChart(isMonthlyNow ? monthData : weekData, isMonthlyNow);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupI18n();
+    // In case dom already loaded:
+    if(document.readyState === 'complete' || document.readyState === 'interactive') {
+        setupI18n();
+    }
+    // 기본 언어(ko)로 초기화
+    changeLang(currentLang);
+});
+
+</script>
+</body>
+</html>

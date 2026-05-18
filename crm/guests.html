@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투숙객 관리 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/crm.css">
+<style>
+/* Mobile filter trigger */
+.m-filter-trigger{display:none;height:36px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:#fff;font-size:.75rem;font-weight:600;color:var(--txt);cursor:pointer;font-family:var(--font);align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;width:120px}
+.m-filter-trigger i{font-size:.65rem;color:var(--txt3)}
+.m-filter-trigger span{flex:1;text-align:left}
+
+/* Bottom sheet */
+.bottom-sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;pointer-events:none;transition:opacity .3s}
+.bottom-sheet-overlay.active{opacity:1;pointer-events:auto}
+.bottom-sheet{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#fff;border-radius:16px 16px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,.72,0,1);max-height:60vh;box-shadow:0 -4px 30px rgba(0,0,0,.15)}
+.bottom-sheet.active{transform:translateY(0)}
+.bottom-sheet-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:10px auto 0}
+.bottom-sheet-title{padding:16px 20px 8px;font-size:.88rem;font-weight:700;color:var(--txt)}
+.bottom-sheet-options{padding:0 12px 20px}
+.bs-option{display:flex;align-items:center;gap:12px;padding:14px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:var(--font);font-size:.82rem;color:var(--txt)}
+.bs-option:hover,.bs-option:active{background:var(--border2)}
+.bs-option.selected{background:rgba(99,102,241,.06);color:var(--primary);font-weight:700}
+.bs-option-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.bs-option-check{margin-left:auto;font-size:.8rem;color:var(--primary);opacity:0}
+.bs-option.selected .bs-option-check{opacity:1}
+.bs-option-label{flex:1}
+.bs-option-desc{font-size:.68rem;color:var(--txt3);font-weight:400;margin-top:2px}
+
+@media(max-width:768px){
+    .m-filter-trigger{display:flex}
+    .filter-chips{display:none!important}
+    .filter-left{flex-direction:row!important;gap:8px!important;flex-wrap:nowrap!important;align-items:center!important}
+    .filter-left .search-box{flex:1;min-width:0;width:auto!important}
+}
+
+/* Guest Detail Panel (Center Modal PC / Bottom Sheet Mobile) */
+.guest-detail-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 10000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+.guest-detail-overlay.active { opacity: 1; pointer-events: auto; }
+
+@media (min-width: 769px) {
+    .guest-detail-panel {
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -45%);
+        width: 800px; max-width: 90vw; max-height: 85vh; background: #fff;
+        border-radius: 16px; z-index: 10001; opacity: 0; pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        display: flex; flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    .guest-detail-panel.active { opacity: 1; transform: translate(-50%, -50%); pointer-events: auto; }
+    .gd-handle { display: none; }
+    .gd-body { overflow-y: auto; padding: 24px; flex: 1; }
+    .gd-header { padding: 20px 24px; border-bottom: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
+}
+
+@media (max-width: 768px) {
+    .guest-detail-panel {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        height: 92vh; /* Fully expanded initially */
+        background: #fff; border-radius: 20px 20px 0 0;
+        z-index: 10001; transform: translateY(100%);
+        transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+        display: flex; flex-direction: column;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+    }
+    .guest-detail-panel.active { transform: translateY(0); }
+    .gd-handle { width: 40px; height: 5px; border-radius: 3px; background: #cbd5e1; margin: 12px auto 4px; flex-shrink: 0; cursor: grab; }
+    .gd-header { padding: 0 20px 16px; border-bottom: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; }
+    .gd-body { overflow-y: auto; padding: 16px 20px; flex: 1; overscroll-behavior-y: contain; }
+}
+
+.gd-title { font-size: 1.2rem; font-weight: 700; color: var(--txt); display: flex; align-items: center; }
+.gd-close { background: none; border: none; font-size: 1.3rem; color: var(--txt2); cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s; }
+.gd-close:hover { background: var(--bg); color: var(--danger); }
+
+.gd-dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+@media (max-width: 768px) { .gd-dashboard { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; } }
+.gd-kpi { background: #f8fafc; border-radius: 12px; padding: 16px; border: 1px solid var(--border2); text-align: center; }
+.gd-kpi-val { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+.gd-kpi-lbl { font-size: 0.75rem; color: var(--txt2); font-weight: 600; }
+
+.gd-history-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 12px; color: var(--txt); display:flex; align-items:center; gap:8px; }
+.gd-history-title i { color: var(--primary); }
+.gd-history table { width: 100%; border-collapse: collapse; }
+.gd-history th, .gd-history td { padding: 14px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+.gd-history th { background: #f1f5f9; font-weight: 600; color: var(--txt2); }
+
+@media (max-width: 768px) {
+    .gd-history table, .gd-history thead, .gd-history tbody, .gd-history tr, .gd-history td { display: block; width: 100%; }
+    .gd-history thead { display: none; }
+    .gd-history tbody tr { background: #fff !important; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .gd-history tr:hover td { background: transparent !important; }
+    .gd-history td { border: none; border-bottom: 1px solid #f1f5f9; padding: 10px 0; display: flex; justify-content: space-between; align-items: center; text-align: right; }
+    .gd-history td:last-child { border-bottom: none; padding-bottom: 4px; }
+    .gd-history td::before { content: attr(data-label); font-weight: 600; color: var(--txt2); text-align: left; font-size:0.8rem; }
+}
+</style>
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>투숙객 관리</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <!-- KPI -->
+        <div class="kpi-grid kpi-grid-4">
+            <div class="kpi-card blue">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-users"></i></div></div>
+                <div class="kpi-value">2,847</div>
+                <div class="kpi-label">총 고객 수</div>
+                <div class="kpi-sub">이번 달 신규 +128</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-rotate"></i></div></div>
+                <div class="kpi-value">34.2%</div>
+                <div class="kpi-label">재방문율</div>
+                <div class="kpi-sub">2회 이상 투숙 고객</div>
+            </div>
+            <div class="kpi-card orange">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-crown"></i></div></div>
+                <div class="kpi-value">186</div>
+                <div class="kpi-label">VIP 고객</div>
+                <div class="kpi-sub">Gold 94 · Platinum 52 · Diamond 40</div>
+            </div>
+            <div class="kpi-card purple">
+                <div class="kpi-top"><div class="kpi-icon"><i class="fa-solid fa-dollar-sign"></i></div></div>
+                <div class="kpi-value">$148</div>
+                <div class="kpi-label">고객당 평균 지출</div>
+                <div class="kpi-sub">전월 대비 +$19</div>
+            </div>
+        </div>
+
+        <!-- FILTER -->
+        <div class="filter-bar">
+            <div class="filter-left">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="이름, 이메일, 전화번호 검색..." oninput="renderGuests()">
+                </div>
+                <div class="filter-chips">
+                    <button class="chip active" onclick="setTier(this,'all')">전체</button>
+                    <button class="chip" onclick="setTier(this,'diamond')"><i class="fa-solid fa-gem" style="color:#60A5FA"></i> Diamond</button>
+                    <button class="chip" onclick="setTier(this,'platinum')"><i class="fa-solid fa-star" style="color:#A78BFA"></i> Platinum</button>
+                    <button class="chip" onclick="setTier(this,'gold')"><i class="fa-solid fa-crown" style="color:#F59E0B"></i> Gold</button>
+                    <button class="chip" onclick="setTier(this,'standard')">Standard</button>
+                </div>
+                <button class="m-filter-trigger" onclick="openBottomSheet()">
+                    <i class="fa-solid fa-filter"></i>
+                    <span id="mFilterLabel">전체</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="filter-right">
+                <button class="btn-outline"><i class="fa-solid fa-download"></i> 엑셀 다운</button>
+                <button class="btn-primary-sm" onclick="openModal('addGuestModal')"><i class="fa-solid fa-plus"></i> 신규 고객 등록</button>
+            </div>
+        </div>
+
+        <!-- TABLE (desktop) -->
+        <div class="card desktop-only" style="margin-top:16px">
+            <div class="card-body" style="padding:0">
+                <div class="table-wrap">
+                    <table><thead><tr>
+                        <th>고객</th><th>국적</th><th>등급</th><th>방문 횟수</th><th>최근 투숙</th><th>총 지출</th><th>연락처</th><th>관리</th>
+                    </tr></thead>
+                    <tbody id="guestBody"></tbody></table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARDS (mobile) -->
+        <div class="mobile-cards mobile-only" id="guestMobile"></div>
+
+        <div class="pagination" style="margin-top:16px">
+            <span class="page-info">총 <b>16명</b> 표시</span>
+            <div class="page-btns">
+                <button class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Sheet -->
+<div class="bottom-sheet-overlay" id="bsOverlay" onclick="closeBottomSheet()"></div>
+<div class="bottom-sheet" id="bsPanel">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-title">등급 필터 선택</div>
+    <div class="bottom-sheet-options">
+        <button class="bs-option selected" onclick="selectFilter('all','전체')">
+            <div class="bs-option-icon" style="background:var(--border2);color:var(--txt2)"><i class="fa-solid fa-users"></i></div>
+            <div class="bs-option-label">전체<div class="bs-option-desc">모든 등급 고객 표시</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('diamond','Diamond')">
+            <div class="bs-option-icon" style="background:rgba(96,165,250,.1);color:#60A5FA"><i class="fa-solid fa-gem"></i></div>
+            <div class="bs-option-label">Diamond<div class="bs-option-desc">최상위 등급 고객</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('platinum','Platinum')">
+            <div class="bs-option-icon" style="background:rgba(167,139,250,.1);color:#A78BFA"><i class="fa-solid fa-star"></i></div>
+            <div class="bs-option-label">Platinum<div class="bs-option-desc">상위 등급 고객</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('gold','Gold')">
+            <div class="bs-option-icon" style="background:rgba(245,158,11,.1);color:#F59E0B"><i class="fa-solid fa-crown"></i></div>
+            <div class="bs-option-label">Gold<div class="bs-option-desc">우수 등급 고객</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+        <button class="bs-option" onclick="selectFilter('standard','Standard')">
+            <div class="bs-option-icon" style="background:rgba(156,163,175,.1);color:#9CA3AF"><i class="fa-solid fa-user"></i></div>
+            <div class="bs-option-label">Standard<div class="bs-option-desc">일반 등급 고객</div></div>
+            <i class="fa-solid fa-check bs-option-check"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+const guests = [
+    {name:'Nguyen Thi Lan',init:'NT',color:'#3B82F6',nation:'🇻🇳 Vietnam',tier:'gold',visits:12,last:'2026-05-10',spend:4482,email:'ntlan@email.com',phone:'+84 90 123 4567'},
+    {name:'John Smith',init:'JS',color:'#8B5CF6',nation:'🇺🇸 USA',tier:'platinum',visits:8,last:'2026-05-12',spend:6240,email:'jsmith@email.com',phone:'+1 212 555 0142'},
+    {name:'Tran Linh',init:'TL',color:'#F59E0B',nation:'🇻🇳 Vietnam',tier:'diamond',visits:24,last:'2026-05-12',spend:18900,email:'tlinh@email.com',phone:'+84 91 888 9999'},
+    {name:'Park Soo Jin',init:'PS',color:'#10B981',nation:'🇰🇷 Korea',tier:'gold',visits:6,last:'2026-05-12',spend:2970,email:'psj@email.com',phone:'+82 10 5678 1234'},
+    {name:'Garcia Miguel',init:'GM',color:'#EC4899',nation:'🇪🇸 Spain',tier:'diamond',visits:18,last:'2026-05-12',spend:14700,email:'garcia@email.com',phone:'+34 612 345 678'},
+    {name:'Tanaka Yuki',init:'TY',color:'#10B981',nation:'🇯🇵 Japan',tier:'platinum',visits:10,last:'2026-05-08',spend:7800,email:'tanaka@email.com',phone:'+81 80 1234 5678'},
+    {name:'Kim Da Eun',init:'KD',color:'#3B82F6',nation:'🇰🇷 Korea',tier:'gold',visits:5,last:'2026-05-12',spend:2375,email:'kde@email.com',phone:'+82 10 9876 5432'},
+    {name:'Al Rashid Omar',init:'AR',color:'#F59E0B',nation:'🇦🇪 UAE',tier:'diamond',visits:15,last:'2026-04-20',spend:22500,email:'alrashid@email.com',phone:'+971 50 123 4567'},
+    {name:'Lee Hana',init:'LH',color:'#8B5CF6',nation:'🇰🇷 Korea',tier:'platinum',visits:9,last:'2026-05-07',spend:5625,email:'leehana@email.com',phone:'+82 10 1111 2222'},
+    {name:'Pham Anh',init:'PA',color:'#10B981',nation:'🇻🇳 Vietnam',tier:'standard',visits:2,last:'2026-05-05',spend:570,email:'panh@email.com',phone:'+84 93 456 7890'},
+    {name:'Chen Wei',init:'CW',color:'#3B82F6',nation:'🇨🇳 China',tier:'gold',visits:7,last:'2026-05-06',spend:3640,email:'chenwei@email.com',phone:'+86 138 0000 1234'},
+    {name:'Mueller Klaus',init:'MK',color:'#EC4899',nation:'🇩🇪 Germany',tier:'standard',visits:3,last:'2026-04-28',spend:1560,email:'mueller@email.com',phone:'+49 170 123 4567'},
+    {name:'Wong Li',init:'WL',color:'#F59E0B',nation:'🇭🇰 Hong Kong',tier:'gold',visits:11,last:'2026-05-04',spend:5720,email:'wongli@email.com',phone:'+852 9123 4567'},
+    {name:'Sato Yuki',init:'SY',color:'#8B5CF6',nation:'🇯🇵 Japan',tier:'standard',visits:1,last:'2026-05-01',spend:520,email:'sato@email.com',phone:'+81 90 5555 6666'},
+    {name:'Bui Tien',init:'BT',color:'#10B981',nation:'🇻🇳 Vietnam',tier:'standard',visits:2,last:'2026-04-22',spend:540,email:'buitien@email.com',phone:'+84 97 111 2222'},
+    {name:'David Chen',init:'DC',color:'#3B82F6',nation:'🇹🇼 Taiwan',tier:'platinum',visits:14,last:'2026-05-03',spend:8400,email:'dchen@email.com',phone:'+886 912 345 678'},
+];
+
+const tierCfg = {
+    diamond:{label:'Diamond',icon:'fa-gem',color:'#60A5FA',bg:'rgba(96,165,250,.1)'},
+    platinum:{label:'Platinum',icon:'fa-star',color:'#A78BFA',bg:'rgba(167,139,250,.1)'},
+    gold:{label:'Gold',icon:'fa-crown',color:'#F59E0B',bg:'rgba(245,158,11,.1)'},
+    standard:{label:'Standard',icon:'fa-user',color:'#9CA3AF',bg:'rgba(156,163,175,.1)'}
+};
+
+let currentTier = 'all';
+
+function renderGuests() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const filtered = guests.filter(g => {
+        if (currentTier !== 'all' && g.tier !== currentTier) return false;
+        if (search && !g.name.toLowerCase().includes(search) && !g.email.toLowerCase().includes(search) && !g.phone.includes(search)) return false;
+        return true;
+    });
+
+    const tbody = document.getElementById('guestBody');
+    const mobile = document.getElementById('guestMobile');
+    const t = tierCfg;
+
+    // Desktop table
+    tbody.innerHTML = filtered.map(g => {
+        const tc = t[g.tier];
+        return `<tr onclick="openGuestDetail('${g.email}')" style="cursor:pointer" class="guest-row">
+            <td><div class="guest-cell"><div class="guest-avatar" style="background:${g.color}">${g.init}</div><div><strong>${g.name}</strong> <span style="font-size:.7rem;color:var(--txt3)">${g.email}</span></div></div></td>
+            <td>${g.nation}</td>
+            <td><span class="tier-badge" style="background:${tc.bg};color:${tc.color}"><i class="fa-solid ${tc.icon}"></i> ${tc.label}</span></td>
+            <td><strong>${g.visits}</strong>회</td>
+            <td>${g.last}</td>
+            <td style="font-weight:700">$${g.spend.toLocaleString()}</td>
+            <td><span style="font-size:.75rem;color:var(--txt2)">${g.phone}</span></td>
+            <td><div class="action-btns">
+                <button class="act-btn" title="상세"><i class="fa-solid fa-eye"></i></button>
+            </div></td>
+        </tr>`;
+    }).join('');
+
+    // Mobile cards
+    mobile.innerHTML = filtered.map(g => {
+        const tc = t[g.tier];
+        return `<div class="m-res-card" onclick="openGuestDetail('${g.email}')" style="cursor:pointer">
+            <div class="m-res-top">
+                <div class="m-res-guest">
+                    <div class="guest-avatar" style="background:${g.color}">${g.init}</div>
+                    <div>
+                        <div class="m-res-name">${g.name}</div>
+                        <div class="m-res-sub">${g.nation}</div>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <span class="tier-badge" style="background:${tc.bg};color:${tc.color}"><i class="fa-solid ${tc.icon}"></i> ${tc.label}</span>
+                    <div class="m-res-amount">$${g.spend.toLocaleString()}</div>
+                </div>
+            </div>
+            <div class="m-res-details">
+                <div class="m-res-detail"><i class="fa-solid fa-rotate"></i> 방문 ${g.visits}회</div>
+                <div class="m-res-detail"><i class="fa-solid fa-calendar"></i> 최근: ${g.last}</div>
+                <div class="m-res-detail"><i class="fa-solid fa-phone"></i> ${g.phone}</div>
+                <div class="m-res-detail"><i class="fa-solid fa-envelope"></i> ${g.email}</div>
+            </div>
+            <div class="m-res-actions">
+                <button class="act-btn"><i class="fa-solid fa-eye"></i> 상세</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function setTier(btn, tier) {
+    currentTier = tier;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderGuests();
+}
+
+// Bottom sheet
+function openBottomSheet() {
+    document.getElementById('bsOverlay').classList.add('active');
+    document.getElementById('bsPanel').classList.add('active');
+}
+function closeBottomSheet() {
+    document.getElementById('bsOverlay').classList.remove('active');
+    document.getElementById('bsPanel').classList.remove('active');
+}
+function selectFilter(tier, label) {
+    currentTier = tier;
+    // Update bottom sheet selected state
+    document.querySelectorAll('.bs-option').forEach(o => o.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    // Update mobile trigger label
+    document.getElementById('mFilterLabel').textContent = label;
+    // Sync desktop chips
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    const chips = document.querySelectorAll('.chip');
+    if (tier === 'all') chips[0].classList.add('active');
+    else if (tier === 'diamond') chips[1].classList.add('active');
+    else if (tier === 'platinum') chips[2].classList.add('active');
+    else if (tier === 'gold') chips[3].classList.add('active');
+    else chips[4].classList.add('active');
+    closeBottomSheet();
+    renderGuests();
+}
+
+function toggleMenu() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    document.querySelector('.sidebar-overlay').classList.toggle('active');
+}
+
+renderGuests();
+
+// i18n
+let currentLang='ko';
+const translations={ko:{"투숙객 관리":"투숙객 관리","대시보드":"대시보드","예약 타임라인":"예약 타임라인","예약 목록":"예약 목록","체크인/아웃":"체크인/아웃","VIP 멤버십":"VIP 멤버십","객실 관리":"객실 관리","하우스키핑":"하우스키핑","통합 정산":"통합 정산","부가서비스":"부가서비스","호텔 설정":"호텔 설정","직원 관리":"직원 관리","총 고객 수":"총 고객 수","재방문율":"재방문율","VIP 고객":"VIP 고객","고객당 평균 지출":"고객당 평균 지출","전체":"전체","엑셀 다운":"엑셀 다운","고객 등록":"고객 등록","고객":"고객","국적":"국적","등급":"등급","방문 횟수":"방문 횟수","최근 투숙":"최근 투숙","총 지출":"총 지출","연락처":"연락처","관리":"관리"},en:{"투숙객 관리":"Guest CRM","대시보드":"Dashboard","예약 타임라인":"Reservations","예약 목록":"Booking List","체크인/아웃":"Check-in/out","VIP 멤버십":"VIP Members","객실 관리":"Room Mgmt","하우스키핑":"Housekeeping","통합 정산":"Folio & Billing","부가서비스":"Ancillary Svcs","호텔 설정":"Hotel Settings","직원 관리":"Staff Mgmt","총 고객 수":"Total Guests","재방문율":"Return Rate","VIP 고객":"VIP Guests","고객당 평균 지출":"Avg. Spend/Guest","전체":"All","엑셀 다운":"Export Excel","고객 등록":"Add Guest","고객":"Guest","국적":"Country","등급":"Tier","방문 횟수":"Visits","최근 투숙":"Last Stay","총 지출":"Total Spend","연락처":"Contact","관리":"Actions"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){currentLang=l;const d=translations[l]||translations.ko;document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]});    document.getElementById('searchInput').placeholder=l==='en'?'Search name, phone, email...':'이름, 연락처, 이메일 검색...';
+}
+
+// 모달
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function saveGuest() {
+    alert('신규 고객이 등록되었습니다.');
+    closeModal('addGuestModal');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+
+<!-- Add Guest Modal -->
+<div class="modal-overlay" id="addGuestModal" onclick="if(event.target===this) closeModal('addGuestModal')">
+    <div class="modal-card" style="max-width:500px;width:95vw">
+        <div class="modal-header">
+            <h3 class="modal-title">신규 고객 등록</h3>
+            <button class="modal-close" onclick="closeModal('addGuestModal')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" style="padding:20px;display:flex;flex-direction:column;gap:16px">
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">First Name (이름) <span style="color:var(--danger)">*</span></label>
+                    <input type="text" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">Last Name (성) <span style="color:var(--danger)">*</span></label>
+                    <input type="text" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%">
+                </div>
+            </div>
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">연락처 <span style="color:var(--danger)">*</span></label>
+                    <input type="text" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%" placeholder="+84 ">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">이메일</label>
+                    <input type="email" style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%">
+                </div>
+            </div>
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">국적</label>
+                    <select style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                        <option>Vietnam</option>
+                        <option>South Korea</option>
+                        <option>United States</option>
+                        <option>Japan</option>
+                    </select>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">VIP 등급 지정</label>
+                    <select style="height:38px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                        <option value="standard">Standard (기본)</option>
+                        <option value="gold">Gold</option>
+                        <option value="platinum">Platinum</option>
+                        <option value="diamond">Diamond</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:.8rem;font-weight:600;color:var(--txt2)">특이사항 / 선호도</label>
+                <textarea style="min-height:60px;border:1px solid var(--border);border-radius:4px;padding:10px;font-family:var(--font);width:100%;resize:vertical" placeholder="금연 객실 선호 등..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer" style="padding:16px 20px;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+            <button class="btn-outline" onclick="closeModal('addGuestModal')">취소</button>
+            <button class="btn-primary-sm" onclick="saveGuest()"><i class="fa-solid fa-check"></i> 고객 등록</button>
+        </div>
+    </div>
+</div>
+
+<!-- Guest Detail Modal / Bottom Sheet -->
+<div class="guest-detail-overlay" id="guestDetailOverlay" onclick="closeGuestDetail()"></div>
+<div class="guest-detail-panel" id="guestDetailPanel">
+    <div class="gd-handle mobile-only"></div>
+    <div class="gd-header">
+        <div class="gd-title" id="gdName">Guest Name</div>
+        <button class="gd-close" onclick="closeGuestDetail()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="gd-body" id="gdBody">
+        <!-- 상단 대시보드 (Top Dashboard) -->
+        <div class="gd-dashboard">
+            <div class="gd-kpi"><div class="gd-kpi-val" id="gdVisits">0회</div><div class="gd-kpi-lbl">총 투숙 횟수</div></div>
+            <div class="gd-kpi"><div class="gd-kpi-val" id="gdLastStay">-</div><div class="gd-kpi-lbl">최근 투숙일</div></div>
+            <div class="gd-kpi"><div class="gd-kpi-val" id="gdSpend">$0</div><div class="gd-kpi-lbl">누적 금액</div></div>
+            <div class="gd-kpi"><div class="gd-kpi-val" id="gdCancel" style="color:var(--danger)">0 / 0</div><div class="gd-kpi-lbl">노쇼 / 취소</div></div>
+        </div>
+
+        <!-- 고객 기본 정보 (Detail Info fields matching New Guest form) -->
+        <div class="gd-profile-form" style="margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--border2);">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; gap:8px;">
+                <div style="font-size:0.95rem; font-weight:700; color:var(--txt); word-break:keep-all;"><i class="fa-solid fa-address-card"></i> 기본 인적 사항</div>
+                <button class="btn-primary-sm" style="height:28px; padding:0 12px; font-size:0.75rem; white-space:nowrap; flex-shrink:0; width:auto;" onclick="alert('저장되었습니다.')"><i class="fa-solid fa-check"></i> 정보 수정</button>
+            </div>
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr !important;gap:12px;margin-bottom:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px">
+                    <label style="font-size:.75rem;font-weight:600;color:var(--txt2)">First Name (이름) <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="gdInputFirstName" style="height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                    <label style="font-size:.75rem;font-weight:600;color:var(--txt2)">Last Name (성) <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="gdInputLastName" style="height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;">
+                </div>
+            </div>
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr !important;gap:12px;margin-bottom:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px">
+                    <label style="font-size:.75rem;font-weight:600;color:var(--txt2)">연락처 <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="gdInputPhone" style="height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                    <label style="font-size:.75rem;font-weight:600;color:var(--txt2)">이메일</label>
+                    <input type="email" id="gdInputEmail" style="height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%">
+                </div>
+            </div>
+            <div class="modal-form-grid" style="display:grid;grid-template-columns:1fr 1fr !important;gap:12px;margin-bottom:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px">
+                    <label style="font-size:.75rem;font-weight:600;color:var(--txt2)">국적</label>
+                    <select id="gdInputNation" style="height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                        <option value="🇻🇳 Vietnam">Vietnam</option>
+                        <option value="🇰🇷 Korea">South Korea</option>
+                        <option value="🇺🇸 USA">United States</option>
+                        <option value="🇯🇵 Japan">Japan</option>
+                        <option value="🇪🇸 Spain">Spain</option>
+                        <option value="🇦🇪 UAE">UAE</option>
+                        <option value="🇨🇳 China">China</option>
+                        <option value="🇩🇪 Germany">Germany</option>
+                        <option value="🇭🇰 Hong Kong">Hong Kong</option>
+                        <option value="🇹🇼 Taiwan">Taiwan</option>
+                    </select>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px">
+                    <label style="font-size:.75rem;font-weight:600;color:var(--txt2)">VIP 등급 지정</label>
+                    <select id="gdInputTier" style="height:34px;border:1px solid var(--border);border-radius:4px;padding:0 10px;font-family:var(--font);width:100%;background:#fff">
+                        <option value="standard">Standard (기본)</option>
+                        <option value="gold">Gold</option>
+                        <option value="platinum">Platinum</option>
+                        <option value="diamond">Diamond</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+                <label style="font-size:.75rem;font-weight:600;color:var(--txt2)">특이사항 / 선호도</label>
+                <textarea style="min-height:50px;border:1px solid var(--border);border-radius:4px;padding:8px 10px;font-family:var(--font);width:100%;resize:vertical" placeholder="예: 금연 객실 선호"></textarea>
+            </div>
+        </div>
+        <!-- 하단 상세 이력 (Bottom Stay History) -->
+        <div class="gd-history">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+                <div class="gd-history-title" style="margin-bottom:0;"><i class="fa-solid fa-list"></i> 상세 투숙 이력</div>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <input type="date" class="form-control" style="height:30px; padding:0 8px; border:1px solid var(--border); border-radius:4px; font-size:0.75rem; font-family:var(--font);" id="gdFilterStart">
+                    <span style="color:var(--txt2);font-size:0.8rem">~</span>
+                    <input type="date" class="form-control" style="height:30px; padding:0 8px; border:1px solid var(--border); border-radius:4px; font-size:0.75rem; font-family:var(--font);" id="gdFilterEnd">
+                    <button class="btn-primary-sm" style="height:30px; padding:0 12px; font-size:0.75rem; white-space:nowrap;" onclick="filterDummyHistory()">조회</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>투숙 일자</th>
+                        <th>객실 타입</th>
+                        <th>결제 금액</th>
+                        <th>상태</th>
+                    </tr>
+                </thead>
+                <tbody id="gdHistoryBody">
+                    <!-- JS Injected -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function openGuestDetail(email) {
+    const guest = guests.find(g => g.email === email);
+    if(!guest) return;
+
+    // Populate data
+    const t = tierCfg[guest.tier];
+    document.getElementById('gdName').innerHTML = `<span class="tier-badge" style="background:${t.bg};color:${t.color};margin-right:8px"><i class="fa-solid ${t.icon}"></i> ${t.label}</span> ${guest.name}`;
+    
+    document.getElementById('gdVisits').textContent = guest.visits + '회';
+    document.getElementById('gdLastStay').textContent = guest.last;
+    document.getElementById('gdSpend').textContent = '$' + guest.spend.toLocaleString();
+    
+    // Populate profile form fields
+    const nameParts = guest.name.trim().split(' ');
+    const lastName = nameParts.length > 1 ? nameParts.pop() : '';
+    const firstName = nameParts.join(' ');
+    document.getElementById('gdInputFirstName').value = firstName || guest.name;
+    document.getElementById('gdInputLastName').value = lastName;
+    document.getElementById('gdInputPhone').value = guest.phone;
+    document.getElementById('gdInputEmail').value = guest.email;
+    const nSel = document.getElementById('gdInputNation');
+    if(!Array.from(nSel.options).some(o => o.value === guest.nation)) {
+        nSel.add(new Option(guest.nation, guest.nation));
+    }
+    nSel.value = guest.nation;
+    document.getElementById('gdInputTier').value = guest.tier;
+    
+    // Dummy No-show/Cancel data based on name length for variation
+    const noShow = guest.name.length % 2;
+    const cancel = (guest.name.length % 3) + 1;
+    document.getElementById('gdCancel').textContent = `${noShow} / ${cancel}`;
+
+    // Generate Dummy History
+    const tbody = document.getElementById('gdHistoryBody');
+    let historyHtml = '';
+    const stayCount = Math.max(guest.visits, 15); // Show at least 15 items for scroll demonstration
+    window.currentGuestVisits = []; // store for filter
+    
+    for(let i=0; i<stayCount; i++) {
+        const d = new Date(guest.last);
+        d.setDate(d.getDate() - (i*30)); // space out past stays by ~1 month
+        const checkIn = d.toISOString().split('T')[0];
+        d.setDate(d.getDate() + (guest.name.length % 3 + 1));
+        const checkOut = d.toISOString().split('T')[0];
+        
+        const roomTypes = ['Deluxe King', 'Standard Twin', 'Executive Suite', 'Ocean View', 'Family Room'];
+        const rt = roomTypes[(guest.name.length + i) % roomTypes.length];
+        const pmt = Math.floor((guest.spend / guest.visits) || 200);
+
+        window.currentGuestVisits.push({ checkIn, checkOut, rt, pmt });
+    }
+    
+    renderDummyHistory(window.currentGuestVisits);
+
+    // Mobile Expansion Reset
+    const panel = document.getElementById('guestDetailPanel');
+    panel.classList.remove('expanded');
+
+    // Show
+    document.getElementById('guestDetailOverlay').classList.add('active');
+    panel.classList.add('active');
+}
+
+function renderDummyHistory(data) {
+    const tbody = document.getElementById('gdHistoryBody');
+    if(data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--txt3)">해당 기간의 이력이 없습니다.</td></tr>`;
+        return;
+    }
+    let html = '';
+    data.forEach(v => {
+        html += `
+        <tr>
+            <td data-label="투숙 일자">${v.checkIn} ~ ${v.checkOut}</td>
+            <td data-label="객실 타입">${v.rt}</td>
+            <td data-label="결제 금액"><strong>$${v.pmt.toLocaleString()}</strong></td>
+            <td data-label="상태"><span style="color:var(--success);font-weight:600">완료</span></td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+function filterDummyHistory() {
+    const start = document.getElementById('gdFilterStart').value;
+    const end = document.getElementById('gdFilterEnd').value;
+    if(!start && !end) {
+        renderDummyHistory(window.currentGuestVisits);
+        return;
+    }
+    
+    const filtered = window.currentGuestVisits.filter(v => {
+        let pass = true;
+        if(start && v.checkIn < start) pass = false;
+        if(end && v.checkIn > end) pass = false;
+        return pass;
+    });
+    renderDummyHistory(filtered);
+}
+
+function closeGuestDetail() {
+    document.getElementById('guestDetailOverlay').classList.remove('active');
+    document.getElementById('guestDetailPanel').classList.remove('active');
+}
+
+// Mobile Scroll/Drag to Expand Bottom Sheet
+document.addEventListener('DOMContentLoaded', () => {
+    const gdBody = document.getElementById('gdBody');
+    const panel = document.getElementById('guestDetailPanel');
+    const handle = document.querySelector('.gd-handle');
+    
+    // Expand on scroll up (which means scrolling down the content)
+    gdBody.addEventListener('scroll', function() {
+        if (window.innerWidth <= 768 && this.scrollTop > 10) {
+            panel.classList.add('expanded');
+        }
+    });
+
+    // Expand or close on handle drag
+    let startY = 0;
+    handle.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, {passive: true});
+    handle.addEventListener('touchmove', e => {
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+        if (diff > 50) {
+            closeGuestDetail(); // Dragged down enough
+        } else if (diff < -30) {
+            panel.classList.add('expanded'); // Dragged up enough
+        }
+    }, {passive: true});
+});
+</script>
+
+</body>
+</html>
