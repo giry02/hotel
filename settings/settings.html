@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>호텔 설정 — Hotel PMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../common/css/dashboard.css">
+    <link rel="stylesheet" href="../common/css/frontdesk.css">
+    <link rel="stylesheet" href="../common/css/settings.css">
+    <script src="../common/js/sidebar.js"></script>
+</head>
+<body>
+
+<div class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="mobile-menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+            <h1>호텔 설정</h1>
+            <span class="date-badge"><i class="fa-regular fa-calendar"></i> 2026년 5월 12일 (월)</span>
+        </div>
+        <div class="topbar-right">
+            <div style="font-size:0.85rem;font-weight:700;color:var(--txt);margin-right:8px;display:flex;align-items:center;gap:4px"><i class="fa-solid fa-hotel" style="color:var(--primary)"></i> The Grand Saigon</div>
+            <select class="hotel-select" id="langSelect" onchange="changeLang(this.value)" style="width:110px">
+                <option value="ko">🇰🇷 한국어</option><option value="en">🇺🇸 English</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="settings-grid">
+            <!-- Left Column: Basic Info -->
+            <div style="display: flex; flex-direction: column; height: 100%;">
+                <div class="form-section" id="sec-basic" style="height: 100%; display: flex; flex-direction: column; margin-bottom: 0;">
+                    <div class="form-header">
+                        <div class="form-title">기본 정보</div>
+                        <div class="form-desc">호텔의 프로필 및 연락처 정보를 설정합니다. OTA 채널과 웹사이트에 노출됩니다.</div>
+                    </div>
+                    <div class="form-body" style="flex: 1; display: flex; flex-direction: column;">
+                        <div class="form-row" style="flex: 1; grid-template-rows: auto auto auto 1fr;">
+                            <div class="form-group full">
+                                <label class="form-label">호텔 이름 <span>*</span></label>
+                                <input type="text" class="form-control" value="The Grand Saigon">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">대표 전화번호</label>
+                                <input type="text" class="form-control" value="+84 28 3915 5555">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">대표 이메일</label>
+                                <input type="email" class="form-control" value="info@grandsaigon.com">
+                            </div>
+                            <div class="form-group full">
+                                <label class="form-label">호텔 주소</label>
+                                <input type="text" class="form-control" value="8 Dong Khoi Street, District 1, Ho Chi Minh City">
+                            </div>
+                            <div class="form-group full" style="display: flex; flex-direction: column; height: 100%;">
+                                <label class="form-label">호텔 소개 (다국어 지원)</label>
+                                <textarea class="form-control" style="flex: 1; resize: none; min-height: 80px;">사이공 강의 아름다운 전망을 자랑하는 5성급 럭셔리 호텔입니다.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Policy & Billing -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+                <div class="form-section" id="sec-policy" style="margin-bottom: 0;">
+                    <div class="form-header">
+                        <div class="form-title">운영 정책</div>
+                        <div class="form-desc">체크인/아웃 시간 및 취소 정책을 설정합니다.</div>
+                    </div>
+                    <div class="form-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">기본 체크인 시간</label>
+                                <input type="time" class="form-control" value="15:00">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">기본 체크아웃 시간</label>
+                                <input type="time" class="form-control" value="11:00">
+                            </div>
+                            <div class="form-group full">
+                                <label class="form-label">기본 취소 정책</label>
+                                <select class="form-control">
+                                    <option>체크인 24시간 전까지 무료 취소 (이후 1박 요금 부과)</option>
+                                    <option selected>체크인 48시간 전까지 무료 취소 (이후 1박 요금 부과)</option>
+                                    <option>환불 불가 (Non-refundable)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section" id="sec-billing" style="margin-bottom: 0;">
+                    <div class="form-header">
+                        <div class="form-title">결제 및 세금</div>
+                        <div class="form-desc">기본 통화 및 부가세(VAT) 요율을 설정합니다.</div>
+                    </div>
+                    <div class="form-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">기본 결제 통화</label>
+                                <select class="form-control"><option>USD ($)</option><option selected>KRW (₩)</option><option>VND (₫)</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">기본 세금(VAT) 비율</label>
+                                <input type="number" class="form-control" value="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+            <button class="btn-primary-sm" style="padding: 10px 24px; font-size: 0.95rem;"><i class="fa-solid fa-check"></i> 변경사항 전체 저장</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// i18n
+let currentLang='ko';
+const translations={ko:{"호텔 설정":"호텔 설정","대시보드":"대시보드","예약 타임라인":"예약 타임라인","예약 목록":"예약 목록","체크인/아웃":"체크인/아웃","투숙객 관리":"투숙객 관리","VIP 멤버십":"VIP 멤버십","객실 관리":"객실 관리","하우스키핑":"하우스키핑","통합 정산":"통합 정산","부가서비스":"부가서비스","직원 관리":"직원 관리","기본 정보":"기본 정보","정책 및 규정":"정책 및 규정","결제 및 세금":"결제 및 세금","호텔 이름":"호텔 이름","대표 전화번호":"대표 전화번호","대표 이메일":"대표 이메일","호텔 주소":"호텔 주소","호텔 소개 (다국어 지원)":"호텔 소개 (다국어 지원)","취소":"취소","저장":"저장","운영 정책":"운영 정책","기본 체크인 시간":"기본 체크인 시간","기본 체크아웃 시간":"기본 체크아웃 시간","기본 취소 정책":"기본 취소 정책","오버부킹 (Overbooking) 허용":"오버부킹 (Overbooking) 허용","디파짓(보증금) 필수 청구":"디파짓(보증금) 필수 청구"},en:{"호텔 설정":"Hotel Settings","대시보드":"Dashboard","예약 타임라인":"Reservations","예약 목록":"Booking List","체크인/아웃":"Check-in/out","투숙객 관리":"Guest CRM","VIP 멤버십":"VIP Members","객실 관리":"Room Mgmt","하우스키핑":"Housekeeping","통합 정산":"Folio & Billing","부가서비스":"Ancillary Svcs","직원 관리":"Staff Mgmt","기본 정보":"Basic Info","정책 및 규정":"Policies","결제 및 세금":"Billing & Tax","호텔 이름":"Hotel Name","대표 전화번호":"Main Phone","대표 이메일":"Main Email","호텔 주소":"Hotel Address","호텔 소개 (다국어 지원)":"Hotel Description (Multi)","취소":"Cancel","저장":"Save","운영 정책":"Operational Policies","기본 체크인 시간":"Default Check-in","기본 체크아웃 시간":"Default Check-out","기본 취소 정책":"Cancellation Policy","오버부킹 (Overbooking) 허용":"Allow Overbooking","디파짓(보증금) 필수 청구":"Require Deposit (Pre-auth)"}};
+function setupI18n(){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,null,false);let n;const t=[];while(n=w.nextNode()){const o=n.nodeValue,x=o.trim();if(x&&translations.ko[x]&&!n.parentNode.hasAttribute('data-i18n-key')){const s=document.createElement('span');s.setAttribute('data-i18n-key',x);s.textContent=x;t.push({node:n,span:s,originalText:o})}}t.forEach(({node:n,span:s,originalText:o})=>{const f=document.createDocumentFragment();const l=o.match(/^\s+/),r=o.match(/\s+$/);if(l)f.appendChild(document.createTextNode(l[0]));f.appendChild(s);if(r)f.appendChild(document.createTextNode(r[0]));n.parentNode.replaceChild(f,n)})}
+function changeLang(l){
+    currentLang=l;
+    const d=translations[l]||translations.ko;
+    document.querySelectorAll('[data-i18n-key]').forEach(e=>{const k=e.getAttribute('data-i18n-key');if(d[k])e.textContent=d[k]});
+}
+document.addEventListener('DOMContentLoaded',()=>{setupI18n();changeLang(currentLang)});
+</script>
+</body>
+</html>
