@@ -46,29 +46,29 @@
             items: [
                 {
                     icon: 'fa-bed', label: '객실 관리', id: 'rooms',
-                    mainHref: BASE + 'operations/rooms.html',
+                    mainHref: '#',
                     children: [
-                        { label: '객실 현황/목록', href: BASE + 'operations/rooms.html' },
-                        { label: '객실/유형 등록', href: BASE + 'operations/room-setup.html' },
+                        { label: '객실 현황/목록', href: '#' },
+                        { label: '객실/유형 등록', href: '#' },
                     ]
                 },
-                { icon: 'fa-tags',  label: '요금 캘린더', href: BASE + 'operations/rates.html' },
-                { icon: 'fa-broom', label: '하우스키핑',  href: BASE + 'operations/housekeeping.html', badge: '5' },
+                { icon: 'fa-tags',  label: '요금 캘린더', href: '#' },
+                { icon: 'fa-broom', label: '하우스키핑',  href: '#', badge: '5' },
                 {
                     icon: 'fa-file-invoice-dollar', label: '통합 정산', id: 'folio',
-                    mainHref: BASE + 'operations/folio.html',
+                    mainHref: '#',
                     children: [
-                        { label: '정산 목록', href: BASE + 'operations/folio.html' },
-                        { label: '매출 분석', href: BASE + 'operations/folio-chart.html' },
+                        { label: '정산 목록', href: '#' },
+                        { label: '매출 분석', href: '#' },
                     ]
                 },
                 {
                     icon: 'fa-concierge-bell', label: '부가서비스', id: 'ancillary',
-                    mainHref: BASE + 'operations/room-service.html',
+                    mainHref: '#',
                     children: [
-                        { label: '룸서비스', href: BASE + 'operations/room-service.html' },
-                        { label: '골프장',   href: BASE + 'operations/golf.html' },
-                        { label: '렌트카',   href: BASE + 'operations/rentacar.html' },
+                        { label: '룸서비스', href: '#' },
+                        { label: '골프장',   href: '#' },
+                        { label: '렌트카',   href: '#' },
                     ]
                 },
             ]
@@ -76,8 +76,8 @@
         {
             group: 'Settings',
             items: [
-                { icon: 'fa-gear',        label: '호텔 설정', href: BASE + 'settings/settings.html' },
-                { icon: 'fa-user-shield', label: '직원 관리', href: BASE + 'settings/staff.html' },
+                { icon: 'fa-gear',        label: '호텔 설정', href: '#' },
+                { icon: 'fa-user-shield', label: '직원 관리', href: '#' },
             ]
         },
     ];
