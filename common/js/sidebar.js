@@ -13,10 +13,11 @@
     // dashboard/dashboard.html        → base = ''
     // dashboard/frontdesk/checkin.html → base = '../'
     const _pathParts = window.location.pathname.split('/').filter(Boolean);
-    const _filename  = _pathParts[_pathParts.length - 1] || '';
     const _parentDir = _pathParts[_pathParts.length - 2] || '';
-    // 바로 dashboard 폴더 아래에 있으면 prefix 없음, 한 단계 깊으면 '../'
-    const BASE = (_parentDir === 'dashboard' || _parentDir === '') ? '' : '../';
+    // 알려진 서브폴더에 있으면 한 단계 위로 — 그 외(루트/repo명 등)는 그대로
+    const _subDirs = ['frontdesk', 'operations', 'crm', 'settings'];
+    const BASE = _subDirs.includes(_parentDir) ? '../' : '';
+
 
     // ─── 메뉴 정의 (dashboard/ 기준 상대경로) ────────────────────
     const MENU = [
