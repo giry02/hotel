@@ -18,58 +18,57 @@
     const _subDirs = ['frontdesk', 'operations', 'crm', 'settings'];
     const BASE = _subDirs.includes(_parentDir) ? '../' : '';
 
-
     // ─── 메뉴 정의 (dashboard/ 기준 상대경로) ────────────────────
     const MENU = [
         {
             group: 'Main',
             items: [
-                { icon: 'fa-gauge-high', label: '대시보드', href: BASE + 'hotel/dashboard.html' },
+                { icon: 'fa-gauge-high', label: '대시보드', href: BASE + 'dashboard.html' },
             ]
         },
         {
             group: 'Front Desk',
             items: [
-                { icon: 'fa-calendar-days',    label: '예약 타임라인', href: BASE + 'hotel/frontdesk/reservation-timeline.html' },
-                { icon: 'fa-list-check',       label: '예약 목록',     href: BASE + 'hotel/frontdesk/reservation-list.html' },
-                { icon: 'fa-right-to-bracket', label: '체크인/아웃',   href: BASE + 'hotel/frontdesk/checkin.html' },
+                { icon: 'fa-calendar-days',    label: '예약 타임라인', href: BASE + 'frontdesk/reservation-timeline.html' },
+                { icon: 'fa-list-check',       label: '예약 목록',     href: BASE + 'frontdesk/reservation-list.html' },
+                { icon: 'fa-right-to-bracket', label: '체크인/아웃',   href: BASE + 'frontdesk/checkin.html' },
             ]
         },
         {
             group: 'Guest & CRM',
             items: [
-                { icon: 'fa-users', label: '투숙객 관리', href: BASE + 'hotel/crm/guests.html' },
-                { icon: 'fa-crown', label: 'VIP 멤버십',  href: BASE + 'hotel/crm/membership.html' },
+                { icon: 'fa-users', label: '투숙객 관리', href: BASE + 'crm/guests.html' },
+                { icon: 'fa-crown', label: 'VIP 멤버십',  href: BASE + 'crm/membership.html' },
             ]
         },
         {
             group: 'Operations',
             items: [
                 {
-                    icon: 'fa-bed', label: '객실 관리', id: 'rooms',
-                    mainHref: '#',
+                    icon: 'fa-bed', label: '객실 관리', id: 'rooms', disabled: true,
+                    mainHref: BASE + 'operations/rooms.html',
                     children: [
-                        { label: '객실 현황/목록', href: '#' },
-                        { label: '객실/유형 등록', href: '#' },
+                        { label: '객실 현황/목록', href: BASE + 'operations/rooms.html' },
+                        { label: '객실/유형 등록', href: BASE + 'operations/room-setup.html' },
                     ]
                 },
-                { icon: 'fa-tags',  label: '요금 캘린더', href: '#' },
-                { icon: 'fa-broom', label: '하우스키핑',  href: '#', badge: '5' },
+                { icon: 'fa-tags',  label: '요금 캘린더', href: BASE + 'operations/rates.html', disabled: true },
+                { icon: 'fa-broom', label: '하우스키핑',  href: BASE + 'operations/housekeeping.html', badge: '5', disabled: true },
                 {
-                    icon: 'fa-file-invoice-dollar', label: '통합 정산', id: 'folio',
-                    mainHref: '#',
+                    icon: 'fa-file-invoice-dollar', label: '통합 정산', id: 'folio', disabled: true,
+                    mainHref: BASE + 'operations/folio.html',
                     children: [
-                        { label: '정산 목록', href: '#' },
-                        { label: '매출 분석', href: '#' },
+                        { label: '정산 목록', href: BASE + 'operations/folio.html' },
+                        { label: '매출 분석', href: BASE + 'operations/folio-chart.html' },
                     ]
                 },
                 {
-                    icon: 'fa-concierge-bell', label: '부가서비스', id: 'ancillary',
-                    mainHref: '#',
+                    icon: 'fa-concierge-bell', label: '부가서비스', id: 'ancillary', disabled: true,
+                    mainHref: BASE + 'operations/room-service.html',
                     children: [
-                        { label: '룸서비스', href: '#' },
-                        { label: '골프장',   href: '#' },
-                        { label: '렌트카',   href: '#' },
+                        { label: '룸서비스', href: BASE + 'operations/room-service.html' },
+                        { label: '골프장',   href: BASE + 'operations/golf.html' },
+                        { label: '렌트카',   href: BASE + 'operations/rentacar.html' },
                     ]
                 },
             ]
@@ -77,14 +76,30 @@
         {
             group: 'Settings',
             items: [
-                { icon: 'fa-gear',        label: '호텔 설정', href: '#' },
-                { icon: 'fa-user-shield', label: '직원 관리', href: '#' },
+                { icon: 'fa-gear',        label: '호텔 설정', href: BASE + 'settings/settings.html', disabled: true },
+                { icon: 'fa-user-shield', label: '직원 관리', href: BASE + 'settings/staff.html', disabled: true },
             ]
         },
     ];
 
     // ─── HTML 생성 ────────────────────────────────────────────
+    const DISABLED_STYLE = 'opacity:.42;cursor:not-allowed;pointer-events:none';
+
     function buildNavItem(item) {
+        /* ── disabled: 클릭 불가 span ── */
+        if (item.disabled) {
+            const badge = item.badge ? ` <span class="badge-nav">${item.badge}</span>` : '';
+            if (item.children) {
+                // 아코디언도 disabled면 chevron 없이 span으로
+                return `
+                <span class="nav-item" style="${DISABLED_STYLE}">
+                    <span><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span></span>
+                </span>`;
+            }
+            return `<span class="nav-item" style="${DISABLED_STYLE}"><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span>${badge}</span>`;
+        }
+
+        /* ── 일반 아코디언 ── */
         if (item.children) {
             const children = item.children.map(c =>
                 `<a class="nav-sub-item" href="${c.href}"><span data-i18n-key="${c.label}">${c.label}</span></a>`
@@ -96,6 +111,8 @@
             </div>
             <div class="nav-sub" data-submenu="${item.id}">${children}</div>`;
         }
+
+        /* ── 일반 링크 ── */
         const badge = item.badge ? ` <span class="badge-nav">${item.badge}</span>` : '';
         return `<a class="nav-item" href="${item.href}"><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span>${badge}</a>`;
     }
