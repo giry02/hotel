@@ -23,22 +23,22 @@
         {
             group: 'Main',
             items: [
-                { icon: 'fa-gauge-high', label: '대시보드', href: BASE + 'dashboard.html' },
+                { icon: 'fa-gauge-high', label: '대시보드', href: BASE + '/hotel/dashboard.html' },
             ]
         },
         {
             group: 'Front Desk',
             items: [
-                { icon: 'fa-calendar-days',    label: '예약 타임라인', href: BASE + 'frontdesk/reservation-timeline.html' },
-                { icon: 'fa-list-check',       label: '예약 목록',     href: BASE + 'frontdesk/reservation-list.html' },
-                { icon: 'fa-right-to-bracket', label: '체크인/아웃',   href: BASE + 'frontdesk/checkin.html' },
+                { icon: 'fa-calendar-days',    label: '예약 타임라인', href: BASE + '/hotel/frontdesk/reservation-timeline.html' },
+                { icon: 'fa-list-check',       label: '예약 목록',     href: BASE + '/hotel/frontdesk/reservation-list.html' },
+                { icon: 'fa-right-to-bracket', label: '체크인/아웃',   href: BASE + '/hotel/frontdesk/checkin.html' },
             ]
         },
         {
             group: 'Guest & CRM',
             items: [
-                { icon: 'fa-users', label: '투숙객 관리', href: BASE + 'crm/guests.html' },
-                { icon: 'fa-crown', label: 'VIP 멤버십',  href: BASE + 'crm/membership.html' },
+                { icon: 'fa-users', label: '투숙객 관리', href: BASE + '/hotel/crm/guests.html' },
+                { icon: 'fa-crown', label: 'VIP 멤버십',  href: BASE + '/hotel/crm/membership.html' },
             ]
         },
         {
