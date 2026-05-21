@@ -89,14 +89,7 @@
         /* ── disabled: 클릭 불가 span ── */
         if (item.disabled) {
             const badge = item.badge ? ` <span class="badge-nav">${item.badge}</span>` : '';
-            if (item.children) {
-                // 아코디언도 disabled면 chevron 없이 span으로
-                return `
-                <span class="nav-item" style="${DISABLED_STYLE}">
-                    <span><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span></span>
-                </span>`;
-            }
-            return `<span class="nav-item" style="${DISABLED_STYLE}"><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span>${badge}</span>`;
+            return `<a class="nav-item" href="${item.href}"><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span>${badge}</a>`;
         }
 
         /* ── 일반 아코디언 ── */
