@@ -18,16 +18,43 @@
     const _subDirs = ['frontdesk', 'operations', 'crm', 'settings'];
     const BASE = _subDirs.includes(_parentDir) ? '../' : '';
 
+    // 동적 스크립트 로드 후 DataReady 이벤트 발생 (document.write 안티패턴 제거)
+    const scriptsToLoad = [
+        `${BASE}common/data/ancillaries.js`,
+        `${BASE}common/data/guests.js`,
+        `${BASE}common/data/rooms.js`,
+        `${BASE}common/data/reservations.js`,
+        `${BASE}common/data/orders.js`,
+        `${BASE}common/data/housekeeping.js`
+    ];
+    let loadedCount = 0;
+    scriptsToLoad.forEach(src => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => {
+            loadedCount++;
+            if(loadedCount === scriptsToLoad.length) {
+                window.dispatchEvent(new Event('DataReady'));
+            }
+        };
+        document.head.appendChild(script);
+    });
+
+    // ─── 사용자 역할 로드 (기본값 admin) ─────────
+    window.currentUserRole = localStorage.getItem('currentUserRole') || 'admin';
+
     // ─── 메뉴 정의 (dashboard/ 기준 상대경로) ────────────────────
     const MENU = [
         {
             group: 'Main',
+            roles: ['admin', 'manager', 'housekeeper'],
             items: [
                 { icon: 'fa-gauge-high', label: '대시보드', href: BASE + 'dashboard.html' },
             ]
         },
         {
             group: 'Front Desk',
+            roles: ['admin', 'manager'],
             items: [
                 { icon: 'fa-calendar-days',    label: '예약 타임라인', href: BASE + 'frontdesk/reservation-timeline.html' },
                 { icon: 'fa-list-check',       label: '예약 목록',     href: BASE + 'frontdesk/reservation-list.html' },
@@ -36,6 +63,7 @@
         },
         {
             group: 'Guest & CRM',
+            roles: ['admin', 'manager'],
             items: [
                 { icon: 'fa-users', label: '투숙객 관리', href: BASE + 'crm/guests.html' },
                 { icon: 'fa-crown', label: 'VIP 멤버십',  href: BASE + 'crm/membership.html' },
@@ -43,19 +71,20 @@
         },
         {
             group: 'Operations',
+            roles: ['admin', 'manager', 'housekeeper'],
             items: [
                 {
-                    icon: 'fa-bed', label: '객실 관리', id: 'rooms', disabled: true,
+                    icon: 'fa-bed', label: '객실 관리', id: 'rooms', roles: ['admin', 'manager'],
                     mainHref: BASE + 'operations/rooms.html',
                     children: [
                         { label: '객실 현황/목록', href: BASE + 'operations/rooms.html' },
                         { label: '객실/유형 등록', href: BASE + 'operations/room-setup.html' },
                     ]
                 },
-                { icon: 'fa-tags',  label: '요금 캘린더', href: BASE + 'operations/rates.html', disabled: true },
-                { icon: 'fa-broom', label: '하우스키핑',  href: BASE + 'operations/housekeeping.html', badge: '5', disabled: true },
+                { icon: 'fa-tags',  label: '요금 캘린더', href: BASE + 'operations/rates.html', roles: ['admin', 'manager'] },
+                { icon: 'fa-broom', label: '하우스키핑',  href: BASE + 'operations/housekeeping.html', badge: '5', roles: ['admin', 'manager', 'housekeeper'] },
                 {
-                    icon: 'fa-file-invoice-dollar', label: '통합 정산', id: 'folio', disabled: true,
+                    icon: 'fa-file-invoice-dollar', label: '통합 정산', id: 'folio', roles: ['admin', 'manager'],
                     mainHref: BASE + 'operations/folio.html',
                     children: [
                         { label: '정산 목록', href: BASE + 'operations/folio.html' },
@@ -63,7 +92,7 @@
                     ]
                 },
                 {
-                    icon: 'fa-concierge-bell', label: '부가서비스', id: 'ancillary', disabled: true,
+                    icon: 'fa-concierge-bell', label: '부가서비스', id: 'ancillary', roles: ['admin', 'manager'],
                     mainHref: BASE + 'operations/room-service.html',
                     children: [
                         { label: '룸서비스', href: BASE + 'operations/room-service.html' },
@@ -75,24 +104,19 @@
         },
         {
             group: 'Settings',
+            roles: ['admin', 'manager'],
             items: [
-                { icon: 'fa-gear',        label: '호텔 설정', href: BASE + 'settings/settings.html', disabled: true },
-                { icon: 'fa-user-shield', label: '직원 관리', href: BASE + 'settings/staff.html', disabled: true },
+                { icon: 'fa-gear',        label: '호텔 설정', href: BASE + 'settings/settings.html' },
+                { icon: 'fa-user-shield', label: '직원 관리', href: BASE + 'settings/staff.html' },
+                { icon: 'fa-credit-card', label: '요금 및 결제', href: BASE + 'settings/billing.html' },
+                { icon: 'fa-bullhorn',    label: '공지사항',   href: BASE + 'settings/notices.html' },
+                { icon: 'fa-headset',     label: '고객지원',   href: BASE + 'settings/support.html' }
             ]
         },
     ];
 
     // ─── HTML 생성 ────────────────────────────────────────────
-    const DISABLED_STYLE = 'opacity:.42;cursor:not-allowed;pointer-events:none';
-
     function buildNavItem(item) {
-        /* ── disabled: 클릭 불가 span ── */
-        if (item.disabled) {
-            const badge = item.badge ? ` <span class="badge-nav">${item.badge}</span>` : '';
-            return `<a class="nav-item" href="${item.href}"><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span>${badge}</a>`;
-        }
-
-        /* ── 일반 아코디언 ── */
         if (item.children) {
             const children = item.children.map(c =>
                 `<a class="nav-sub-item" href="${c.href}"><span data-i18n-key="${c.label}">${c.label}</span></a>`
@@ -104,14 +128,20 @@
             </div>
             <div class="nav-sub" data-submenu="${item.id}">${children}</div>`;
         }
-
-        /* ── 일반 링크 ── */
         const badge = item.badge ? ` <span class="badge-nav">${item.badge}</span>` : '';
         return `<a class="nav-item" href="${item.href}"><i class="fa-solid ${item.icon}"></i> <span data-i18n-key="${item.label}">${item.label}</span>${badge}</a>`;
     }
 
     function buildSidebar() {
-        const groups = MENU.map(g => `
+        const userRole = window.currentUserRole;
+        const filteredGroups = MENU.map(g => {
+            if (g.roles && !g.roles.includes(userRole)) return null;
+            const validItems = g.items.filter(item => !item.roles || item.roles.includes(userRole));
+            if (validItems.length === 0) return null;
+            return { group: g.group, items: validItems };
+        }).filter(Boolean);
+
+        const groups = filteredGroups.map(g => `
         <div class="nav-group">
             <div class="nav-group-label" data-i18n-key="${g.group}">${g.group}</div>
             ${g.items.map(buildNavItem).join('')}
@@ -129,12 +159,19 @@
     </div>
     <nav class="sidebar-nav">${groups}</nav>
     <div class="sidebar-bottom">
-        <div class="sidebar-user">
-            <div class="user-avatar">NK</div>
-            <div class="user-info">
-                <div class="user-name">Nguyen Kim</div>
-                <div class="user-role">Front Manager</div>
+        <div class="sidebar-user" style="display:flex;align-items:center;justify-content:space-between;width:100%">
+            <div style="display:flex;align-items:center;gap:12px">
+                <div class="user-avatar">NK</div>
+                <div class="user-info">
+                    <div class="user-name">Nguyen Kim</div>
+                    <div class="user-role" style="text-transform:uppercase">${userRole}</div>
+                </div>
             </div>
+            <select style="width:70px;padding:2px 4px;font-size:0.75rem;border-radius:4px;border:1px solid #ccc;color:#333" onchange="localStorage.setItem('currentUserRole', this.value); location.reload()">
+                <option value="admin" ${userRole==='admin'?'selected':''}>Admin</option>
+                <option value="manager" ${userRole==='manager'?'selected':''}>Manger</option>
+                <option value="housekeeper" ${userRole==='housekeeper'?'selected':''}>HK</option>
+            </select>
         </div>
     </div>
 </aside>`;
